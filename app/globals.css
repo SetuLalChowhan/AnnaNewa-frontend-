@@ -168,3 +168,17 @@
 }
 
 
+@keyframes slide-continuous {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-slide-continuous {
+  display: flex;
+  width: 600%; /* total slides duplicated (3 original × 2 = 6) */
+  animation: slide-continuous 20s linear infinite;
+}

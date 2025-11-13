@@ -1,15 +1,17 @@
-"use client"
-import { useEmailStore } from '@/providers/useState'
-import React from 'react'
+"use client";
+import HeroSection from "@/components/home/HeroSection";
+import { useEmailStore } from "@/providers/useState";
+import React from "react";
 
 const page = () => {
-
-  const email =useEmailStore((state) => state.email);
+  const email = useEmailStore((state) => state.email);
 
   console.log(email);
   return (
-    <div>page</div>
-  )
-}
+    <div>
+      <HeroSection />
+    </div>
+  );
+};
 
-export default page
+export default page;
