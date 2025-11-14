@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 @import "tailwindcss";
 
@@ -6,13 +6,12 @@
 
 @theme {
   /* font */
-  --font-plus:  Poppins, sans-serif;
-  
+  --font-plus: Poppins, sans-serif;
 
   /* color */
 
-  --color-primaryColor: #d4af37;
-
+  --color-primaryColor: #16A34A;
+  --color-secondaryColor:#4B5563;
 
   /* breakpoint */
   --breakpoint-xxs: 390px;
@@ -167,7 +166,6 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-
 @keyframes slide-continuous {
   0% {
     transform: translateX(0%);
@@ -181,4 +179,43 @@
   display: flex;
   width: 600%; /* total slides duplicated (3 original × 2 = 6) */
   animation: slide-continuous 20s linear infinite;
+}
+
+.section-padding-x {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.section-padding-y {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+
+
+@media screen and (min-width: 650px) {
+  .section-padding-x {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .section-padding-y {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  .custom-padding {
+    padding-top: 120px;
+  }
+}
+
+@media screen and (min-width: 1460px) {
+  .section-padding-x {
+    padding-left: 120px;
+    padding-right: 120px;
+  }
+  .section-padding-y {
+    padding-top:80px;
+    padding-bottom: 80px;
+  }
+  .custom-padding {
+    padding-top: 140px;
+  }
 }

@@ -1,9 +1,14 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Image1 from "@/assets/images/v1.jpg";
 import Image2 from "@/assets/images/v2.jpg";
 import Image3 from "@/assets/images/v3.jpg";
 
-const slides = [
+interface Slide {
+  id: number;
+  image: StaticImageData; 
+}
+
+const slides: Slide[] = [
   { id: 1, image: Image1 },
   { id: 2, image: Image2 },
   { id: 3, image: Image3 },
@@ -29,7 +34,7 @@ const HeroSection = () => {
       </div>
 
       {/* Static Content */}
-      <div className="absolute inset-0 z-10 flex flex-col items-start justify-center px-6 sm:px-16 lg:px-28 text-white">
+      <div className="absolute inset-0 z-10 flex flex-col items-start justify-center section-padding-x section-padding-y text-white">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 drop-shadow-lg">
           Connecting Farmers & Buyers Directly
         </h1>
@@ -39,7 +44,7 @@ const HeroSection = () => {
           simple bid system and get the best deal.
         </p>
         <div className="flex gap-4">
-          <button className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium shadow-md transition">
+          <button className="px-6 py-3 bg-primaryColor hover:bg-green-700 rounded-lg text-white font-medium shadow-md transition">
             Browse Products
           </button>
           <button className="px-6 py-3 bg-white text-gray-800 hover:bg-gray-200 rounded-lg font-medium shadow-md transition">

@@ -26,7 +26,7 @@ const Header = () => {
       {/* Logo */}
       <Link
         href="/"
-        className="text-xl sm:text-2xl font-semibold text-green-600 whitespace-nowrap"
+        className="text-xl sm:text-2xl font-semibold text-primaryColor whitespace-nowrap"
       >
         Anna Newa
       </Link>
