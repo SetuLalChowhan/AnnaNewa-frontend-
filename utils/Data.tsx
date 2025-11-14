@@ -5,6 +5,7 @@ import P2 from "@/assets/images/p2.jpg"; // Banana
 import P3 from "@/assets/images/p3.jpg"; // Rice
 import P4 from "@/assets/images/p4.jpg"; // Potato
 import { HowItWorksStep } from "@/types/HowItWorksStep";
+import { Benefit } from "@/types/Benefit";
 export const dummyProducts: Product[] = [
   {
     _id: "1",
@@ -69,5 +70,26 @@ export const HOW_IT_WORKS :HowItWorksStep[] = [
     title: "Bid & We Deliver",
     description:
       "Buyers place bids. Once accepted, we handle the delivery right to the buyer's door. Cash on Delivery.",
+  },
+];
+
+export const BENEFITS: Benefit[] = [
+  {
+    id: 1,
+    icon: "💰",
+    title: "Better Income for Farmers",
+    description: "Sell directly and earn what your hard work truly deserves.",
+  },
+  {
+    id: 2,
+    icon: "🛒",
+    title: "Fair Prices for Customers",
+    description: "Buy fresh, high-quality produce without inflated retail markups.",
+  },
+  {
+    id: 3,
+    icon: "⏱️",
+    title: "Hassle-Free Delivery",
+    description: "Sit back and relax. We manage the logistics from farm to your home.",
   },
 ];

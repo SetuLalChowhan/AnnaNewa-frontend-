@@ -20,8 +20,8 @@ const Header = () => {
 
   return (
     <nav
-      className="flex items-center justify-between px-4 sm:px-6 md:px-12 lg:px-20 xl:px-28 py-4 
-      border-b border-gray-200 bg-white text-gray-800 relative shadow-sm"
+      className="flex sticky top-0 items-center justify-between px-4 sm:px-6 md:px-12 lg:px-20 xl:px-28 py-4 
+      border-b border-gray-200 bg-white text-gray-800 z-50 shadow-sm"
     >
       {/* Logo */}
       <Link
