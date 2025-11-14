@@ -1,5 +1,6 @@
 "use client";
 import HeroSection from "@/components/home/HeroSection";
+import HowItWorksSection from "@/components/home/HowItWorksSection";
 import ProductForBuy from "@/components/home/ProductForBuy";
 import ProductForSell from "@/components/home/ProductForSell";
 import { useEmailStore } from "@/providers/useState";
@@ -14,6 +15,7 @@ const page = () => {
       <HeroSection />
       <ProductForSell />
       <ProductForBuy />
+      <HowItWorksSection/>
     </div>
   );
 };

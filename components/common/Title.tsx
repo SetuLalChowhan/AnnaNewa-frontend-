@@ -23,6 +23,11 @@ export const Title36 = ({ className, children }: TitleProps) => (
     {children}
   </h2>
 );
+export const Title20 = ({ className, children }: TitleProps) => (
+  <h2 className={`${className} text-[20px] font-bold text-gray-800  `}>
+    {children}
+  </h2>
+);
 
 
 
