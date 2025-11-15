@@ -40,10 +40,10 @@ const Header = () => {
 
       {/* Desktop Menu */}
       <div className="hidden xmd:flex items-center gap-4 xlg:gap-10 whitespace-nowrap">
-        <Link href="/" className="hover:text-green-600 transition">
+        <Link href="/" className="hover:text-primaryColor transition">
           Home
         </Link>
-        <Link href="/about" className="hover:text-green-600 transition">
+        <Link href="/about" className="hover:text-primaryColor transition">
           About
         </Link>
 
@@ -55,7 +55,7 @@ const Header = () => {
         >
           <DropdownMenu open={productOpen} onOpenChange={setProductOpen}>
             <DropdownMenuTrigger
-              className="flex items-center gap-1 cursor-pointer hover:text-green-600 transition
+              className="flex items-center gap-1 cursor-pointer hover:text-primaryColor transition
               focus:outline-none focus:ring-0 focus-visible:ring-0"
             >
               Products
@@ -85,15 +85,15 @@ const Header = () => {
           </DropdownMenu>
         </div>
 
-        <Link href="/articles" className="hover:text-green-600 transition">
+        <Link href="/articles" className="hover:text-primaryColor transition">
           Articles
         </Link>
 
-        <Link href="/chat" className="hover:text-green-600 transition">
+        <Link href="/chat" className="hover:text-primaryColor transition">
           Chat
         </Link>
 
-        <Link href="/contact" className="hover:text-green-600 transition">
+        <Link href="/contact" className="hover:text-primaryColor transition">
           Contact
         </Link>
 
@@ -103,7 +103,7 @@ const Header = () => {
       </div>
 
       {/* Hamburger Icon */}
-      <button aria-label="Menu" className="xmd:hidden text-green-600 ml-2">
+      <button aria-label="Menu" className="xmd:hidden text-primaryColor ml-2">
         <Hamburger size={22} toggled={isOpen} toggle={setOpen} />
       </button>
 
