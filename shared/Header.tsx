@@ -13,10 +13,18 @@ import { ArrowIcon } from "@/components/icons/CustomIcons";
 import SearchBar from "@/components/common/SearchBar";
 import Hamburger from "hamburger-react";
 import MobileBar from "./MobileBar";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const [isOpen, setOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Function to check if link is active
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   return (
     <nav
@@ -40,10 +48,21 @@ const Header = () => {
 
       {/* Desktop Menu */}
       <div className="hidden xmd:flex items-center gap-4 xlg:gap-10 whitespace-nowrap">
-        <Link href="/" className="hover:text-primaryColor transition">
+        <Link
+          href="/"
+          className={`hover:text-primaryColor transition ${
+            isActive("/") ? "text-primaryColor font-semibold" : ""
+          }`}
+        >
           Home
         </Link>
-        <Link href="/about" className="hover:text-primaryColor transition">
+
+        <Link
+          href="/about"
+          className={`hover:text-primaryColor transition ${
+            isActive("/about") ? "text-primaryColor font-semibold" : ""
+          }`}
+        >
           About
         </Link>
 
@@ -55,8 +74,11 @@ const Header = () => {
         >
           <DropdownMenu open={productOpen} onOpenChange={setProductOpen}>
             <DropdownMenuTrigger
-              className="flex items-center gap-1 cursor-pointer hover:text-primaryColor transition
-              focus:outline-none focus:ring-0 focus-visible:ring-0"
+              className={`flex items-center gap-1 cursor-pointer transition focus:outline-none focus:ring-0 focus-visible:ring-0 ${
+                isActive("/sell-products") || isActive("/buy-products")
+                  ? "text-primaryColor font-semibold"
+                  : "hover:text-primaryColor"
+              }`}
             >
               Products
               <ArrowIcon
@@ -72,12 +94,26 @@ const Header = () => {
               data-[state=closed]:opacity-0 data-[state=closed]:-translate-y-2"
             >
               <DropdownMenuItem>
-                <Link href="/sell-products" className="w-full">
+                <Link
+                  href="/sell-products"
+                  className={`w-full ${
+                    isActive("/sell-products")
+                      ? "text-primaryColor font-semibold"
+                      : ""
+                  }`}
+                >
                   Sell Products
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link href="/buy-products" className="w-full">
+                <Link
+                  href="/buy-products"
+                  className={`w-full ${
+                    isActive("/buy-products")
+                      ? "text-primaryColor font-semibold"
+                      : ""
+                  }`}
+                >
                   Buy Products
                 </Link>
               </DropdownMenuItem>
@@ -85,15 +121,30 @@ const Header = () => {
           </DropdownMenu>
         </div>
 
-        <Link href="/articles" className="hover:text-primaryColor transition">
+        <Link
+          href="/articles"
+          className={`hover:text-primaryColor transition ${
+            isActive("/articles") ? "text-primaryColor font-semibold" : ""
+          }`}
+        >
           Articles
         </Link>
 
-        <Link href="/chat" className="hover:text-primaryColor transition">
+        <Link
+          href="/chat"
+          className={`hover:text-primaryColor transition ${
+            isActive("/chat") ? "text-primaryColor font-semibold" : ""
+          }`}
+        >
           Chat
         </Link>
 
-        <Link href="/contact" className="hover:text-primaryColor transition">
+        <Link
+          href="/contact"
+          className={`hover:text-primaryColor transition ${
+            isActive("/contact") ? "text-primaryColor font-semibold" : ""
+          }`}
+        >
           Contact
         </Link>
 

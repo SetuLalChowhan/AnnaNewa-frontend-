@@ -1,6 +1,8 @@
+import { ComponentType, SVGProps } from "react";
+
 export type Benefit = {
   id: number;
-  icon: string;
+ icon: ComponentType<SVGProps<SVGSVGElement>>;  
   title: string;
   description: string;
 }

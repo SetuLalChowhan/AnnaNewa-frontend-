@@ -1,6 +1,7 @@
 "use client";
 import { Title36 } from "@/components/common/Title";
 import ArticleSection from "@/components/home/ArticleSection";
+import FooterCTA from "@/components/home/FooterCTA";
 import HeroSection from "@/components/home/HeroSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import ProductForBuy from "@/components/home/ProductForBuy";
@@ -11,9 +12,6 @@ import { useEmailStore } from "@/providers/useState";
 import React from "react";
 
 const page = () => {
-  const email = useEmailStore((state) => state.email);
-
-  console.log(email);
   return (
     <div>
       <HeroSection />
@@ -25,6 +23,7 @@ const page = () => {
       <div className=" flex flex-col ">
         <Title36 className="text-center text-gray-900 ">What Our Customers Say</Title36>
         <Testimonial />
+        <FooterCTA/>
       </div>
     </div>
   );

@@ -24,20 +24,15 @@ export default function HowItWorksSection() {
               "
             >
               {/* ICON */}
-              <div className="
-                text-6xl 
-                w-20 h-20 flex items-center justify-center 
-              bg-linear-to-tr from-green-400 to-blue-500 
-                text-white rounded-full 
-                shadow-lg
-                mb-4
-              ">
-                {step.icon}
-              </div>
+              <div className="flex justify-center mb-4">
+                            <div className="w-20 h-20 text-4xl flex items-center justify-center text-primaryColor bg-green-100   rounded-full">
+                              {<step.icon/>}
+                            </div>
+                          </div>
 
               <Title20 className="font-semibold text-gray-900">{step.title}</Title20>
 
-              <TitleBase className="text-gray-600">{step.description}</TitleBase>
+              <TitleBase className="text-secondaryColor! font-normal!">{step.description}</TitleBase>
             </article>
           ))}
         </div>

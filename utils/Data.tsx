@@ -12,11 +12,13 @@ import A2 from "@/assets/images/a2.jpg"
 import A3 from "@/assets/images/a3.png"
 import A4 from "@/assets/images/a4.jpg"
 import { Testimonial } from "@/types/Testimonial";
+import { FaSeedling, FaHandshake, FaTruck } from "react-icons/fa";
+import { FaMoneyBillWave, FaShoppingCart} from "react-icons/fa";
 export const dummyProducts: Product[] = [
   {
     _id: "1",
     title: "Fresh Korola",
-    description: "Fresh and healthy Korola directly from our farm.",
+    description: "Fresh and healthy Korola directly from our farm. Fresh and healthy Korola directly from our farm.",
     pricePerKg: 100,
     totalWeight: 25,
     images: [P1],
@@ -26,7 +28,7 @@ export const dummyProducts: Product[] = [
   {
     _id: "2",
     title: "Fresh Banana",
-    description: "Sweet and ripe bananas perfect for daily consumption.",
+    description: "Sweet and ripe bananas perfect for daily consumption.Fresh and healthy Korola directly from our farm.",
     pricePerKg: 60,
     totalWeight: 40,
     images: [P2],
@@ -36,7 +38,7 @@ export const dummyProducts: Product[] = [
   {
     _id: "3",
     title: "Organic Rice",
-    description: "High-quality organic rice from our farm.",
+    description: "High-quality organic rice from our farm.Fresh and healthy Korola directly from our farm.",
     pricePerKg: 80,
     totalWeight: 100,
     images: [P3],
@@ -46,7 +48,7 @@ export const dummyProducts: Product[] = [
   {
     _id: "4",
     title: "Organic Potato",
-    description: "Fresh organic potatoes from our farm, healthy and tasty.",
+    description: "Fresh organic potatoes from our farm, healthy and tasty.Fresh and healthy Korola directly from our farm.",
     pricePerKg: 200,
     totalWeight: 50,
     images: [P4],
@@ -58,21 +60,21 @@ export const dummyProducts: Product[] = [
 export const HOW_IT_WORKS: HowItWorksStep[] = [
   {
     id: 1,
-    icon: "📤",
+    icon: FaSeedling,
     title: "Farmers List Produce",
     description:
       "Post what you're harvesting. Set a bid end date and let buyers compete fairly.",
   },
   {
     id: 2,
-    icon: "🤝",
+    icon: FaHandshake,
     title: "We Connect You Directly",
     description:
       "Our platform is the meeting point. No agents, no hidden costs.",
   },
   {
     id: 3,
-    icon: "🚚",
+    icon: FaTruck ,
     title: "Bid & We Deliver",
     description:
       "Buyers place bids. Once accepted, we handle the delivery right to the buyer's door. Cash on Delivery.",
@@ -82,20 +84,20 @@ export const HOW_IT_WORKS: HowItWorksStep[] = [
 export const BENEFITS: Benefit[] = [
   {
     id: 1,
-    icon: "💰",
+    icon: FaMoneyBillWave,
     title: "Better Income for Farmers",
     description: "Sell directly and earn what your hard work truly deserves.",
   },
   {
     id: 2,
-    icon: "🛒",
+    icon: FaShoppingCart,
     title: "Fair Prices for Customers",
     description:
       "Buy fresh, high-quality produce without inflated retail markups.",
   },
   {
     id: 3,
-    icon: "⏱️",
+    icon: FaTruck,
     title: "Hassle-Free Delivery",
     description:
       "Sit back and relax. We manage the logistics from farm to your home.",

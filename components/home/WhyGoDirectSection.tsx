@@ -24,20 +24,17 @@ export default function WhyGoDirectSection() {
               "
             >
               {/* Icon */}
-              <div className="
-                text-5xl w-20 h-20 flex items-center justify-center
-                bg-linear-to-tr from-yellow-400 to-orange-500
-                text-white rounded-full mb-6
-                shadow-lg group-hover:scale-110 transform transition-transform duration-300
-              ">
-                {benefit.icon}
-              </div>
+             <div className="flex justify-center mb-4">
+                            <div className="w-20 h-20 text-4xl flex items-center justify-center text-primaryColor bg-green-100 rounded-full">
+                              {<benefit.icon/>}
+                            </div>
+                          </div>
 
               {/* Title */}
               <Title20 className="font-semibold text-gray-900 mb-2">{benefit.title}</Title20>
 
               {/* Description */}
-              <TitleBase className="text-gray-600">{benefit.description}</TitleBase>
+              <TitleBase className=" text-secondaryColor! font-normal!">{benefit.description}</TitleBase>
             </div>
           ))}
         </div>
