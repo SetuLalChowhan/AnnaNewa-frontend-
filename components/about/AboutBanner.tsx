@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import AboutImage from "@/assets/images/aboutBanner.png"; // <-- replace with your image
+import BigButton from "../common/BigButton";
 
 const AboutBanner = () => {
   return (
@@ -20,7 +21,7 @@ const AboutBanner = () => {
       </div>
 
       {/* Text Content */}
-      <div className="absolute inset-0 flex flex-col justify-center section-padding-x section-padding-y text-white z-10">
+      <div className="absolute inset-0 flex flex-col items-start justify-center section-padding-x section-padding-y text-white z-10">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold max-w-3xl leading-tight drop-shadow-lg">
           Transforming Agriculture, One Direct Connection at a Time
         </h1>
@@ -32,9 +33,7 @@ const AboutBanner = () => {
         </p>
 
         {/* CTA Button — Optional */}
-        <button className="mt-6 px-7 py-3 bg-primaryColor hover:bg-primaryColor/90 text-white font-medium rounded-lg shadow-md transition w-fit">
-          Learn More
-        </button>
+       <BigButton text="Learn More" href="#" className=" mt-6" />
       </div>
     </section>
   );

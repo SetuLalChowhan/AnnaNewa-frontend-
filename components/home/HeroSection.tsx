@@ -2,10 +2,11 @@ import Image, { StaticImageData } from "next/image";
 import Image1 from "@/assets/images/v1.jpg";
 import Image2 from "@/assets/images/v2.jpg";
 import Image3 from "@/assets/images/v3.jpg";
+import BigButton from "../common/BigButton";
 
 interface Slide {
   id: number;
-  image: StaticImageData; 
+  image: StaticImageData;
 }
 
 const slides: Slide[] = [
@@ -44,12 +45,12 @@ const HeroSection = () => {
           simple bid system and get the best deal.
         </p>
         <div className="flex gap-4">
-          <button className="px-6 py-3 bg-primaryColor hover:bg-green-700 rounded-lg text-white font-medium shadow-md transition">
-            Browse Products
-          </button>
-          <button className="px-6 py-3 bg-white text-gray-800 hover:bg-gray-200 rounded-lg font-medium shadow-md transition">
-            Post Your Product
-          </button>
+          <BigButton text="Browse Products" href="#" />
+          <BigButton
+            text=" Post Your Product"
+            href="#"
+            className="bg-white text-gray-800! hover:bg-gray-200"
+          />
         </div>
       </div>
 
