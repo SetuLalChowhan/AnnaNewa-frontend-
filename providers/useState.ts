@@ -1,13 +1,18 @@
 import { create } from "zustand";
 
-// Define the store interface
-interface EmailStore {
+interface ValueStore {
   email: string;
-  setEmail: (newEmail: string) => void;
+  resetToken: string;
+  setEmail: (value: string) => void;
+  setResetToken: (value: string) => void;
+
 }
 
-// Create the store
-export const useEmailStore = create<EmailStore>((set) => ({
+export const useValueStore = create<ValueStore>((set, get) => ({
   email: "",
-  setEmail: (newEmail) => set({ email: newEmail }),
+  resetToken: "",
+
+  setEmail: (value) => set({ email: value }),
+
+  setResetToken: (value) => set({ resetToken: value }),
 }));
