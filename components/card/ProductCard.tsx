@@ -42,7 +42,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </span>
       </div>
       <div className=" w-full p-4 inline-flex">
-        <PrimaryBtn text="View" href="#" className="text-center w-full" />
+        <PrimaryBtn text="View" href="/product/1" className="text-center w-full" />
       </div>
     </div>
   );

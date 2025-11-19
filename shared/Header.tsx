@@ -95,7 +95,7 @@ const Header = () => {
             >
               <DropdownMenuItem>
                 <Link
-                  href="/sell-products"
+                  href="/products?type=sell"
                   className={`w-full ${
                     isActive("/sell-products")
                       ? "text-primaryColor font-semibold"
@@ -107,7 +107,7 @@ const Header = () => {
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Link
-                  href="/buy-products"
+                  href="/products?type=buy"
                   className={`w-full ${
                     isActive("/buy-products")
                       ? "text-primaryColor font-semibold"
