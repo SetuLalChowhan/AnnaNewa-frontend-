@@ -6,10 +6,15 @@ import CommonBanner from "../common/CommonBanner";
 
 const AboutBanner = () => {
   return (
-    <CommonBanner bannerImage={AboutImage} buttonText="Learn More" href="#" title={`Transforming Agriculture, One Direct Connection at a Time`} description={`Annanewa is a revolutionary platform bridging the gap between farmers
+    <CommonBanner
+      bannerImage={AboutImage}
+      buttonText="Learn More"
+      href="#"
+      title={`Transforming Agriculture, One Direct Connection at a Time`}
+      description={`Annanewa is a revolutionary platform bridging the gap between farmers
           and consumers, eliminating middlemen for fair and transparent pricing
-          on both sides.`}/>
-    
+          on both sides.`}
+    />
   );
 };
 

@@ -38,13 +38,13 @@ const CommonBanner = ({
           {title}
         </h1>
 
-        <p className="mt-4 text-base sm:text-lg lg:text-xl max-w-2xl drop-shadow-lg">
+        <p className="mt-8 text-base sm:text-lg lg:text-xl max-w-4xl drop-shadow-lg">
           {description}
         </p>
 
         {/* CTA Button — Optional */}
         {buttonText && href && (
-          <div className="mt-6">
+          <div className="mt-10">
             <BigButton
               text={buttonText || ""}
               href={href ?? ""}

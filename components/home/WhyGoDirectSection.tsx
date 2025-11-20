@@ -10,7 +10,7 @@ export default function WhyGoDirectSection() {
       <div className="max-w-6xl mx-auto px-4 text-center">
         <Title36 className="text-gray-900 mb-12">Why Go Direct With Annanewa?</Title36>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-4">
           {BENEFITS.map((benefit) => (
             <div
               key={benefit.id}

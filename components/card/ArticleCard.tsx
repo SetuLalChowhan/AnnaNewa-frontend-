@@ -51,7 +51,7 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
 
       {/* Button Section */}
       <div className="w-full p-4 inline-flex">
-        <PrimaryBtn text="Read More" href="#" className="text-center w-full" />
+        <PrimaryBtn text="Read More" href="/article/2" className="text-center w-full" />
       </div>
     </div>
   );

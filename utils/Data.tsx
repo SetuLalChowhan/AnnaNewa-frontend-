@@ -15,6 +15,9 @@ import A1 from "@/assets/images/a1.png";
 import A2 from "@/assets/images/a2.jpg";
 import A3 from "@/assets/images/a3.png";
 import A4 from "@/assets/images/a4.jpg";
+import A5 from "@/assets/images/a5.jpeg";
+import A6 from "@/assets/images/a6.jpeg";
+import A7 from "@/assets/images/a7.jpg";
 import { Testimonial } from "@/types/Testimonial";
 import { FaSeedling, FaHandshake, FaTruck } from "react-icons/fa";
 import { FaMoneyBillWave, FaShoppingCart } from "react-icons/fa";
@@ -187,10 +190,11 @@ export const cardsData: Testimonial[] = [
 export const productDetails: ProductDetails = {
   _id: "690592d64fb52136ae1508c8",
   title: "Organic Tomatto",
-  description: "Fresh organic tomatoes from our farm",
+  description:
+    "Fresh, organic tomatoes harvested directly from our farm, carefully grown with love and dedication to ensure the highest quality and natural flavor. Each tomato is nurtured in nutrient-rich soil, free from harmful pesticides and chemicals, allowing you to enjoy the true taste of nature. Juicy, vibrant, and full of natural sweetness, these tomatoes are perfect for salads, sandwiches, cooking, or enjoying fresh on their own. Packed with essential vitamins and antioxidants, they promote health and wellness while adding a burst of freshness to every meal. Experience the wholesome goodness of farm-to-table freshness with every bite of these premium organic tomatoes.m",
   pricePerKg: 50,
   totalWeight: 50,
-  images: [P6,P7,P8,P9,P6,P7,P8,P9],
+  images: [P6, P7, P8, P9, P6, P7, P8, P9],
   user: {
     _id: "6904932a77aba4f1527e4ab4",
     name: "John Farmer",
@@ -250,4 +254,24 @@ export const productDetails: ProductDetails = {
   //   bidAmount: 48,
   //   acceptedAt: "2025-11-01T05:21:44.049Z",
   // },
+};
+
+export const articleDetails: Article = {
+  id: 101,
+  title: "The Science Behind Sweet Mangoes: How Farmers Grow the Perfect Fruit",
+  description: `Mangoes are widely celebrated as the king of fruits, cherished not only for their natural sweetness and irresistible aroma but also for their impressive nutritional value. Across the globe, mangoes have earned a special place in kitchens, markets, and festivals, delighting fruit enthusiasts and culinary experts alike. Their vibrant golden-orange flesh, smooth texture, and naturally sweet flavor make them ideal for desserts, smoothies, salads, and even savory dishes. Beyond their culinary appeal, mangoes hold cultural significance in many countries, often featuring in traditional recipes, celebrations, and local art.
+
+Growing premium-quality mangoes requires patience, skill, and a deep understanding of agricultural practices. Farmers dedicated to producing the perfect mango carefully combine traditional knowledge with modern techniques to ensure consistent quality. A critical first step is selecting the right variety suited to the local climate and soil type. Popular varieties such as Alphonso, Himsagar, and Kent are preferred for their flavor, size, and texture. Once the variety is chosen, preparing the soil is essential. Mango trees thrive in well-drained, nutrient-rich soil, which supports strong root development and healthy tree growth. Many farmers enhance soil fertility with natural compost and organic fertilizers, maintaining ecological balance while promoting optimal yields.
+
+Planting and nurturing the mango trees also plays a vital role. Grafting techniques are commonly used to propagate trees, preserving desirable traits of a particular variety. Saplings are planted with proper spacing to allow sunlight penetration and air circulation, which are crucial for fruit development. Mulching around the tree base helps retain soil moisture, suppress weeds, and maintain temperature levels, reducing stress on the trees.
+
+Proper irrigation, pruning, and pest management are key to high-quality fruit. Mango trees require careful watering to prevent overwatering or waterlogging, which can damage roots. Pruning ensures the tree maintains a healthy structure, improves airflow, and allows sunlight to reach all parts of the canopy. Farmers often rely on natural pest control techniques to minimize chemical use while protecting fruit quality.
+
+Finally, harvesting is a critical stage in producing sweet mangoes. Fruits are handpicked at the optimal stage of ripeness to ensure peak flavor and sweetness. Post-harvest handling includes sorting, cleaning, and sometimes controlled ripening, so mangoes reach consumers in perfect condition. Understanding the ripening process—from tree to table—helps farmers deliver mangoes that are visually appealing, flavorful, and rich in aroma.
+
+In conclusion, producing high-quality mangoes is a combination of science, skill, and dedication. From selecting the right variety and preparing the soil to nurturing trees naturally and harvesting carefully, every step contributes to creating mangoes that truly deserve the title of the king of fruits. Appreciating this process helps consumers value the care and expertise that go into every delicious bite.`,
+  bannerImage: A5,  // your mango banner image
+  images: [A6, A7], // multiple mango images
+  byAdmin: "Admin",
+  createdAt: "2025-03-02T09:45:00Z",
 };

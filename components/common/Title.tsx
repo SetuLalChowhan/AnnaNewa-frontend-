@@ -19,7 +19,7 @@ export const TitleBase = ({ className, children }: TitleProps) => (
   </h2>
 );
 export const Title36 = ({ className, children }: TitleProps) => (
-  <h2 className={`${className} text-4xl font-bold text-gray-800 mb-10 `}>
+  <h2 className={`${className} text-4xl font-bold text-gray-800 `}>
     {children}
   </h2>
 );
