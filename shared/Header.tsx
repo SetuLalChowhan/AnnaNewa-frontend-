@@ -131,7 +131,7 @@ const Header = () => {
         </Link>
 
         <Link
-          href="/chat"
+          href="/ai-chat"
           className={`hover:text-primaryColor transition ${
             isActive("/chat") ? "text-primaryColor font-semibold" : ""
           }`}
