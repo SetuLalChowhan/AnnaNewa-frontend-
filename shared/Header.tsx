@@ -14,6 +14,7 @@ import SearchBar from "@/components/common/SearchBar";
 import Hamburger from "hamburger-react";
 import MobileBar from "./MobileBar";
 import { usePathname } from "next/navigation";
+import UserDropdown from "./UserDropdown";
 
 const Header = () => {
   const [isOpen, setOpen] = useState(false);
@@ -148,9 +149,10 @@ const Header = () => {
           Contact
         </Link>
 
-        <div className="hidden md:block">
+        {/* <div className="hidden md:block">
           <PrimaryBtn text="Login" href="/login" />
-        </div>
+        </div> */}
+        <UserDropdown/>
       </div>
 
       {/* Hamburger Icon */}
