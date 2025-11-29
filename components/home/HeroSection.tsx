@@ -49,7 +49,7 @@ const HeroSection = () => {
           <BigButton
             text=" Post Your Product"
             href="#"
-            className="bg-white text-gray-800! hover:bg-gray-200"
+            className="bg-white text-gray-800! hover:bg-gray-200!"
           />
         </div>
       </div>
