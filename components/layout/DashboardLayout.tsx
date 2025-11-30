@@ -2,10 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { MdDashboard } from "react-icons/md";
+import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { BiData } from "react-icons/bi";
 import DashboardNavbar from "@/shared/DashboardNavbar";
 import DashboardSidebar, { SidebarItem } from "@/shared/DashboardSiderbar";
 import { usePathname } from "next/navigation"; // <- Import hook
-
+import { RiProductHuntLine } from "react-icons/ri";
+import { MdBorderColor } from "react-icons/md";
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
@@ -29,11 +32,40 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     },
     {
       id: 2,
-      icon: <MdDashboard />,
+      icon: <MdOutlineProductionQuantityLimits />,
       text: "Create Product",
       path: "/create-product",
       activePaths: ["/create-product"],
     },
+    {
+      id: 3,
+      icon: <RiProductHuntLine />,
+      text: "My Products",
+      path: "/my-products",
+      activePaths: ["/my-products"],
+    },
+    {
+      id: 4,
+      icon: <MdBorderColor />,
+      text: "My Orders",
+      path: "/my-orders",
+      activePaths: ["/my-orders"],
+    },
+    {
+      id: 5,
+      icon: <BiData />,
+      text: "Bid History",
+      path: "/bid-history",
+      activePaths: ["/bid-history"],
+    },
+    {
+      id: 6,
+      icon: <RiProductHuntLine />,
+      text: "Won Products",
+      path: "/won-products",
+      activePaths: ["/won-products"],
+    },
+
     // {
     //   id: 2,
     //   icon: <MdDashboard />,
