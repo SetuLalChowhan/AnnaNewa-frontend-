@@ -58,13 +58,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       path: "/bid-history",
       activePaths: ["/bid-history"],
     },
-    {
-      id: 6,
-      icon: <RiProductHuntLine />,
-      text: "Won Products",
-      path: "/won-products",
-      activePaths: ["/won-products"],
-    },
+
 
     // {
     //   id: 2,
