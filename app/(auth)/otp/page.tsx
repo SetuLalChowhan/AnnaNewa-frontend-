@@ -1,5 +1,9 @@
 "use client";
 
+import ErrorHandler from "@/components/common/ErrorHandler";
+import useMutationClient from "@/hooks/useMutationClient";
+import { useValueStore } from "@/providers/useState";
+import { Loader } from "lucide-react";
 import React, { useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 
@@ -11,14 +15,38 @@ const Page = () => {
   const { control, handleSubmit, setValue } = useForm<OTPFormData>({
     defaultValues: { otp: ["", "", "", "", "", ""] },
   });
+  const { apiError, setApiError, email } = useValueStore();
 
   const inputRefs = useRef<HTMLInputElement[]>([]);
 
+  const otpMutation = useMutationClient({
+    url: `/auth/verify-email`,
+    method: "post",
+    isPrivate: false,
+    successMessage: " OTP verified successfully!",
+    redirectTo: "/login",
+  });
+  const resetMutation = useMutationClient({
+    url: `/auth/resend-otp`,
+    method: "post",
+    isPrivate: false,
+    successMessage: " OTP resent successfully!",
+  });
+
   const onSubmit = (data: OTPFormData) => {
-    console.log("OTP Entered:", data.otp.join(""));
+    const payload = {
+      email,
+      code: data.otp.join(""),
+    };
+
+    otpMutation.mutate({ data: payload });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number, field: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    field: any
+  ) => {
     const value = e.target.value;
     if (/^\d$/.test(value)) {
       const newOtp = [...(field.value ?? ["", "", "", "", "", ""])];
@@ -34,7 +62,11 @@ const Page = () => {
     }
   };
 
-  const handleBackspace = (e: React.KeyboardEvent<HTMLInputElement>, index: number, field: any) => {
+  const handleBackspace = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number,
+    field: any
+  ) => {
     if (e.key === "Backspace") {
       e.preventDefault();
       const newOtp = [...(field.value ?? ["", "", "", "", "", ""])];
@@ -46,7 +78,10 @@ const Page = () => {
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, field: any) => {
+  const handlePaste = (
+    e: React.ClipboardEvent<HTMLInputElement>,
+    field: any
+  ) => {
     e.preventDefault();
     const pasteData = e.clipboardData.getData("Text").slice(0, 6).split("");
     const newOtp = [...(field.value ?? ["", "", "", "", "", ""])];
@@ -58,6 +93,14 @@ const Page = () => {
     inputRefs.current[nextIndex]?.focus();
   };
 
+  const resendOtp = () => {
+    const payload = {
+      email,
+      type: "verification",
+    };
+    resetMutation.mutate({ data: payload });
+  };
+
   return (
     <div className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg p-8 max-w-md mx-auto mt-10">
       <h2 className="text-2xl font-bold text-primaryColor text-center mb-6">
@@ -67,7 +110,10 @@ const Page = () => {
         Enter the 6-digit OTP sent to your registered number/email
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center space-y-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col items-center space-y-6"
+      >
         <Controller
           name="otp"
           control={control}
@@ -97,16 +143,28 @@ const Page = () => {
 
         <button
           type="submit"
-          className="w-full bg-primaryColor text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
+          className="w-full bg-primaryColor text-white py-3 rounded-lg flex justify-center items-center font-semibold hover:opacity-90 transition"
         >
-          Verify OTP
+          {otpMutation.isPending ? (
+            <Loader className="animate-spin text-white" size={24} />
+          ) : (
+            "Verify OTP"
+          )}
         </button>
       </form>
 
       <p className="text-sm text-center text-gray-500 mt-4">
         Didn't receive OTP?{" "}
-        <button className="text-primaryColor hover:underline">Resend OTP</button>
+        <button
+          className="text-primaryColor hover:underline"
+          onClick={resendOtp}
+        >
+          {resetMutation.isPending ? " Sending..." : "Resend OTP"}
+        </button>
       </p>
+      {apiError && (
+        <ErrorHandler message={apiError} onClose={() => setApiError("")} />
+      )}
     </div>
   );
 };

@@ -149,10 +149,10 @@ const Header = () => {
           Contact
         </Link>
 
-        {/* <div className="hidden md:block">
+        <div className="hidden md:block">
           <PrimaryBtn text="Login" href="/login" />
-        </div> */}
-        <UserDropdown/>
+        </div>
+        {/* <UserDropdown/> */}
       </div>
 
       {/* Hamburger Icon */}

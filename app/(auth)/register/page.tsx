@@ -1,7 +1,11 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import Link from "next/link";
+import useMutationClient from "@/hooks/useMutationClient";
+import { Loader } from "lucide-react";
+import ErrorHandler from "@/components/common/ErrorHandler";
+import { useValueStore } from "@/providers/useState";
 
 type SignupFormData = {
   name: string;
@@ -23,17 +27,41 @@ const Page = () => {
     watch,
     formState: { errors },
   } = useForm<SignupFormData>();
+  
+  const { apiError, setApiError, setEmail } = useValueStore();
+
+  const signUpMutation = useMutationClient({
+    url: `/auth/register`,
+    method: "post",
+    isPrivate: false,
+    successMessage: "Signup successful!",
+    redirectTo: "/otp",
+  });
 
   const onSubmit = (data: SignupFormData) => {
-    console.log("Signup Data:", data);
-    // Here you can send data to backend API
+    const payload = {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      role: data.role,
+      password: data.password,
+      confirm_password: data.confirm_password,
+      address: {
+        street: data.street,
+        city: data.city,
+        state: data.state,
+        zipCode: data.zipCode,
+      },
+    };
+    setEmail(data.email);
+
+    signUpMutation.mutate({ data: payload });
   };
 
   const password = watch("password");
 
   return (
-    <div className="w-full  bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg p-8 relative">
-
+    <div className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg p-8 relative">
       {/* Back to Home */}
       <Link
         href="/"
@@ -51,7 +79,6 @@ const Page = () => {
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
         {/* Name */}
         <div>
           <input
@@ -75,9 +102,9 @@ const Page = () => {
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
               errors.email ? "border-red-500" : "focus:ring-primaryColor"
             }`}
-            {...register("email", { 
+            {...register("email", {
               required: "Email is required",
-              pattern: { value: /^\S+@\S+$/i, message: "Invalid email" }
+              pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
             })}
           />
           {errors.email && (
@@ -110,6 +137,7 @@ const Page = () => {
             }`}
             {...register("street", { required: "Street is required" })}
           />
+
           <input
             type="text"
             placeholder="City"
@@ -118,14 +146,16 @@ const Page = () => {
             }`}
             {...register("city", { required: "City is required" })}
           />
+
           <input
             type="text"
-            placeholder="State"
+            placeholder="State / Division"
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
               errors.state ? "border-red-500" : "focus:ring-primaryColor"
             }`}
             {...register("state", { required: "State is required" })}
           />
+
           <input
             type="text"
             placeholder="Zip Code"
@@ -159,13 +189,15 @@ const Page = () => {
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
               errors.password ? "border-red-500" : "focus:ring-primaryColor"
             }`}
-            {...register("password", { 
+            {...register("password", {
               required: "Password is required",
-              minLength: { value: 6, message: "Minimum 6 characters" }
+              minLength: { value: 6, message: "Minimum 6 characters" },
             })}
           />
           {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -175,20 +207,24 @@ const Page = () => {
             type="password"
             placeholder="Confirm Password"
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-              errors.confirm_password ? "border-red-500" : "focus:ring-primaryColor"
+              errors.confirm_password
+                ? "border-red-500"
+                : "focus:ring-primaryColor"
             }`}
-            {...register("confirm_password", { 
+            {...register("confirm_password", {
               required: "Confirm password is required",
-              validate: value =>
-                value === password || "Passwords do not match"
+              validate: (value) =>
+                value === password || "Passwords do not match",
             })}
           />
           {errors.confirm_password && (
-            <p className="text-red-500 text-sm mt-1">{errors.confirm_password.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.confirm_password.message}
+            </p>
           )}
         </div>
 
-        {/* Already have account */}
+        {/* Already account */}
         <p className="text-sm text-center text-gray-500">
           Already have an account?{" "}
           <Link href="/login" className="text-primaryColor hover:underline">
@@ -196,12 +232,20 @@ const Page = () => {
           </Link>
         </p>
 
-        {/* Submit Button */}
+        {apiError && (
+          <ErrorHandler message={apiError} onClose={() => setApiError("")} />
+        )}
+
+        {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-primaryColor text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
+          className="w-full bg-primaryColor flex justify-center items-center text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
         >
-          Sign Up
+          {signUpMutation.isPending ? (
+            <Loader className="animate-spin text-white" size={24} />
+          ) : (
+            "Sign Up"
+          )}
         </button>
       </form>
     </div>
