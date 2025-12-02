@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useAxiosPublic from "./useAxiosPublic";
 import useAxiosSecure from "./useAxiosSecure";
 import { useValueStore } from "@/providers/useState";
+import { useAuth } from "./useAuth";
 
 type Method = "post" | "put" | "delete" | "patch";
 
@@ -13,8 +14,6 @@ type Payload<T> = {
   config?: AxiosRequestConfig;
 };
 const { apiError, setApiError } = useValueStore.getState();
-
-
 
 const useMutationClient = <T = any, V = any>({
   url,
@@ -26,6 +25,7 @@ const useMutationClient = <T = any, V = any>({
   redirectTo,
   onSuccess,
   onError,
+  isLogin = false,
 }: {
   url: string;
   method?: Method;
@@ -34,21 +34,27 @@ const useMutationClient = <T = any, V = any>({
   successMessage?: string;
   errorMessage?: string;
   redirectTo?: string;
-  onSuccess?: (data: T) => void;
+  onSuccess?: (data: any) => void;
   onError?: (error: any) => void;
+  isLogin?: boolean;
 }) => {
   const queryClient = useQueryClient();
   const client = isPrivate ? useAxiosSecure() : useAxiosPublic();
-const router = useRouter();
+  const { setUser } = useAuth();
+
+  const router = useRouter();
   return useMutation<T, any, Payload<V>>({
     mutationFn: async ({ data, config }) =>
       method === "delete"
-        ? (await client.delete(url, config)).data
-        : (await client[method](url, data, config)).data,
+        ? await client.delete(url, config)
+        : await client[method](url, data, config),
 
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       toast.success((data as any)?.message || successMessage);
 
+      if (isLogin) {
+        setUser(data.user);
+      }
       // ✅ Wrap key array in { queryKey: key }
       invalidateKeys.forEach((key) =>
         queryClient.invalidateQueries({ queryKey: key })

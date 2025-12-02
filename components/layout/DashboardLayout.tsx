@@ -9,6 +9,7 @@ import DashboardSidebar, { SidebarItem } from "@/shared/DashboardSiderbar";
 import { usePathname } from "next/navigation"; // <- Import hook
 import { RiProductHuntLine } from "react-icons/ri";
 import { MdBorderColor } from "react-icons/md";
+import { CiSettings } from "react-icons/ci";
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
@@ -58,7 +59,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       path: "/bid-history",
       activePaths: ["/bid-history"],
     },
-
+    {
+      id: 6,
+      icon: <CiSettings />,
+      text: "Setting",
+      path: "/setting",
+      activePaths: ["/setting"],
+    },
 
     // {
     //   id: 2,

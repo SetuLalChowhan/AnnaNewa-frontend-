@@ -237,3 +237,7 @@
 .marginTop{
   margin-top: 80px;
 }
+
+button{
+  cursor: pointer;
+}

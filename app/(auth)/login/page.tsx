@@ -2,6 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import useMutationClient from "@/hooks/useMutationClient";
+import { Loader } from "lucide-react";
+import ErrorHandler from "@/components/common/ErrorHandler";
+import { useValueStore } from "@/providers/useState";
 
 type LoginFormData = {
   email: string;
@@ -14,14 +18,23 @@ const Page = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>();
+  const { apiError, setApiError, setEmail } = useValueStore();
+
+  const signInMutation = useMutationClient({
+    url: `/auth/login`,
+    method: "post",
+    isPrivate: false,
+    successMessage: "Login successful!",
+    redirectTo: "/",
+    isLogin: true,
+  });
 
   const onSubmit = (data: LoginFormData) => {
-    console.log("Login Data:", data);
+    signInMutation.mutate({ data: data });
   };
 
   return (
     <div className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg p-8 relative">
-
       {/* Back to Home */}
       <Link
         href="/"
@@ -39,7 +52,6 @@ const Page = () => {
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
         {/* Email */}
         <div>
           <input
@@ -66,7 +78,9 @@ const Page = () => {
             {...register("password", { required: "Password is required" })}
           />
           {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -79,10 +93,7 @@ const Page = () => {
             Forgot password?
           </Link>
 
-          <Link
-            href="/register"
-            className="text-primaryColor hover:underline"
-          >
+          <Link href="/register" className="text-primaryColor hover:underline">
             Create account
           </Link>
         </div>
@@ -90,11 +101,18 @@ const Page = () => {
         {/* Button */}
         <button
           type="submit"
-          className="w-full bg-primaryColor text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
+          className="w-full bg-primaryColor flex justify-center items-center text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
         >
-          Login
+          {signInMutation.isPending ? (
+            <Loader className="animate-spin text-white" size={24} />
+          ) : (
+            "Login"
+          )}
         </button>
 
+        {apiError && (
+          <ErrorHandler message={apiError} onClose={() => setApiError("")} />
+        )}
       </form>
     </div>
   );

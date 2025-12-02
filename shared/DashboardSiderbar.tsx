@@ -82,7 +82,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           <div className="p-2 bg-primaryColor rounded-lg group-hover:shadow-lg group-hover:shadow-primaryColor/40 transition-all duration-200">
             <FaReact className="text-white text-lg" />
           </div>
-          Anna Newa
+          AnnaNewa
         </Link>
 
         {/* Navigation */}

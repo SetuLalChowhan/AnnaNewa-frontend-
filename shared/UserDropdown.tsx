@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { PlusCircle, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import useMutationClient from "@/hooks/useMutationClient";
 
 interface UserType {
   name: string;
@@ -25,18 +27,19 @@ interface UserDropdownProps {
 const UserDropdown: React.FC<UserDropdownProps> = ({ className = "" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const { userData: user, logout } = useAuth();
 
-  // Dummy user data
-  const user: UserType = {
-    name: "John Doe",
-    email: "john@example.com",
-    profile_pic: "", // leave empty for default
-  };
+  const logoutMutation = useMutationClient({
+    url: `/auth/logout`,
+    method: "post",
+    isPrivate: false,
+    successMessage: "Logout successful!",
+    redirectTo: "/login",
+  });
 
   // Logout function example
   const handleLogout = () => {
-    console.log("User logged out");
-    // add real logout logic here
+    logout();
     setIsOpen(false);
   };
 
@@ -61,7 +64,10 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ className = "" }) => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -69,7 +75,8 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ className = "" }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const getUserInitial = () => user.name.charAt(0).toUpperCase() || "U";
+  const getUserInitial = () => user?.name.charAt(0).toUpperCase() ;
+  console.log(user?.profilePicture?.url);
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
@@ -78,9 +85,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ className = "" }) => {
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex cursor-pointer items-center justify-center aspect-square bg-gray-200 shadow-md w-10 h-10 rounded-full font-medium hover:opacity-90 transition-opacity"
       >
-        {user.profile_pic ? (
+        {user?.profilePicture?.url ? (
           <img
-            src={user.profile_pic}
+            src={user.profilePicture.url}
             alt="avatar"
             className="rounded-full aspect-square w-10 h-10"
           />
@@ -100,8 +107,10 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ className = "" }) => {
         >
           {/* User Info */}
           <div className="px-4 py-3 border-b">
-            <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-            <p className="text-xs text-gray-600 truncate">{user.email}</p>
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {user?.name}
+            </p>
+            <p className="text-xs text-gray-600 truncate">{user?.email}</p>
           </div>
 
           {/* Menu Items */}

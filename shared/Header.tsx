@@ -15,11 +15,13 @@ import Hamburger from "hamburger-react";
 import MobileBar from "./MobileBar";
 import { usePathname } from "next/navigation";
 import UserDropdown from "./UserDropdown";
+import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
   const [isOpen, setOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
   const pathname = usePathname();
+  const { userData ,user} = useAuth();
 
   // Function to check if link is active
   const isActive = (href: string) => {
@@ -35,9 +37,9 @@ const Header = () => {
       {/* Logo */}
       <Link
         href="/"
-        className="text-xl sm:text-2xl font-semibold text-primaryColor whitespace-nowrap"
+        className="text-xl sm:text-2xl font-bold text-primaryColor whitespace-nowrap"
       >
-        Anna Newa
+        AnnaNewa
       </Link>
 
       {/* Middle Section */}
@@ -149,10 +151,13 @@ const Header = () => {
           Contact
         </Link>
 
-        <div className="hidden md:block">
-          <PrimaryBtn text="Login" href="/login" />
-        </div>
-        {/* <UserDropdown/> */}
+        {user ? (
+          <UserDropdown />
+        ) : (
+          <div className="hidden md:block">
+            <PrimaryBtn text="Login" href="/login" />
+          </div>
+        )}
       </div>
 
       {/* Hamburger Icon */}
