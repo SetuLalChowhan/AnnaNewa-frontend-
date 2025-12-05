@@ -2,6 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import useMutationClient from "@/hooks/useMutationClient";
+import { useValueStore } from "@/providers/useState";
+import ErrorHandler from "@/components/common/ErrorHandler";
+import { Loader } from "lucide-react";
 
 type ResetPasswordFormData = {
   password: string;
@@ -15,17 +19,29 @@ const Page = () => {
     watch,
     formState: { errors },
   } = useForm<ResetPasswordFormData>();
+  const { apiError, email, resetToken, setApiError } = useValueStore();
+  const resetPasswordMutation = useMutationClient({
+    url: `/auth/reset-password`,
+    method: "post",
+    isPrivate: false,
+    successMessage: "Password reset successfully!",
+    redirectTo: "/login",
+  });
 
   const onSubmit = (data: ResetPasswordFormData) => {
-    console.log("Reset Password Data:", data);
-    // Call backend API to reset password here
+    const payload = {
+      email,
+      resetKey: resetToken,
+      password: data.password,
+      confirm_password: data.confirm_password,
+    };
+    resetPasswordMutation.mutate({ data: payload });
   };
 
   const password = watch("password", "");
 
   return (
     <div className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg p-8 relative">
-
       {/* Back to Home */}
       <Link
         href="/"
@@ -43,7 +59,6 @@ const Page = () => {
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
         {/* Password */}
         <div>
           <input
@@ -52,13 +67,18 @@ const Page = () => {
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
               errors.password ? "border-red-500" : "focus:ring-primaryColor"
             }`}
-            {...register("password", { 
+            {...register("password", {
               required: "Password is required",
-              minLength: { value: 8, message: "Password must be at least 8 characters" },
+              minLength: {
+                value: 8,
+                message: "Password must be at least 8 characters",
+              },
             })}
           />
           {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -68,26 +88,39 @@ const Page = () => {
             type="password"
             placeholder="Confirm Password"
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-              errors.confirm_password ? "border-red-500" : "focus:ring-primaryColor"
+              errors.confirm_password
+                ? "border-red-500"
+                : "focus:ring-primaryColor"
             }`}
-            {...register("confirm_password", { 
+            {...register("confirm_password", {
               required: "Confirm your password",
-              validate: value => value === password || "Passwords do not match"
+              validate: (value) =>
+                value === password || "Passwords do not match",
             })}
           />
           {errors.confirm_password && (
-            <p className="text-red-500 text-sm mt-1">{errors.confirm_password.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.confirm_password.message}
+            </p>
           )}
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-primaryColor text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
+          className="w-full bg-primaryColor flex justify-center items-center text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
         >
-          Reset Password
+          {resetPasswordMutation.isPending ? (
+            <Loader className="animate-spin text-white" size={24} />
+          ) : (
+            "Reset Password"
+          )}
         </button>
       </form>
+
+      {apiError && (
+        <ErrorHandler message={apiError} onClose={() => setApiError("")} />
+      )}
 
       {/* Link to login */}
       <p className="text-sm text-center text-gray-500 mt-4">

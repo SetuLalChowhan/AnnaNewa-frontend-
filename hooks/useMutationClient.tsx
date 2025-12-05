@@ -6,6 +6,7 @@ import useAxiosPublic from "./useAxiosPublic";
 import useAxiosSecure from "./useAxiosSecure";
 import { useValueStore } from "@/providers/useState";
 import { useAuth } from "./useAuth";
+import { set } from "react-hook-form";
 
 type Method = "post" | "put" | "delete" | "patch";
 
@@ -41,6 +42,7 @@ const useMutationClient = <T = any, V = any>({
   const queryClient = useQueryClient();
   const client = isPrivate ? useAxiosSecure() : useAxiosPublic();
   const { setUser } = useAuth();
+  const { setResetToken } = useValueStore();
 
   const router = useRouter();
   return useMutation<T, any, Payload<V>>({
@@ -54,6 +56,9 @@ const useMutationClient = <T = any, V = any>({
 
       if (isLogin) {
         setUser(data.user);
+      }
+      if (data.resetKey) {
+        setResetToken(data.resetKey);
       }
       // ✅ Wrap key array in { queryKey: key }
       invalidateKeys.forEach((key) =>
