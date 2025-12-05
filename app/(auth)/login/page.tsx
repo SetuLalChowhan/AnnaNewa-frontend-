@@ -27,6 +27,7 @@ const Page = () => {
     successMessage: "Login successful!",
     redirectTo: "/",
     isLogin: true,
+    invalidateKeys: [["userProfile"]],
   });
 
   const onSubmit = (data: LoginFormData) => {

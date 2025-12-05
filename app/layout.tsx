@@ -30,6 +30,7 @@ export default async function RootLayout({
     // SSR: Get cookie from request
     const cookieStore = await cookies(); // ✅ already awaitable
     const tokenCookie = cookieStore.get("token")?.value;
+    
 
     if (tokenCookie) {
       const res = await axios.get(`${API_URL}/auth/profile`, {
