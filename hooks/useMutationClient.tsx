@@ -26,7 +26,6 @@ const useMutationClient = <T = any, V = any>({
   redirectTo,
   onSuccess,
   onError,
-  isLogin = false,
 }: {
   url: string;
   method?: Method;
@@ -37,7 +36,6 @@ const useMutationClient = <T = any, V = any>({
   redirectTo?: string;
   onSuccess?: (data: any) => void;
   onError?: (error: any) => void;
-  isLogin?: boolean;
 }) => {
   const queryClient = useQueryClient();
   const client = isPrivate ? useAxiosSecure() : useAxiosPublic();
@@ -54,9 +52,6 @@ const useMutationClient = <T = any, V = any>({
     onSuccess: (data: any) => {
       toast.success((data as any)?.message || successMessage);
 
-      if (isLogin) {
-        setUser(data.user);
-      }
       if (data.resetKey) {
         setResetToken(data.resetKey);
       }

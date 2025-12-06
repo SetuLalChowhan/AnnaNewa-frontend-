@@ -43,7 +43,7 @@ export default async function RootLayout({
     user = null;
   }
 
-  console.log(user)
+
 
   return (
     <html lang="en">

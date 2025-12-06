@@ -335,17 +335,12 @@ const ProductForm: FC = () => {
         })),
       };
 
-      console.log('📤 === DATA SENT TO BACKEND ===');
-      console.log(payload);
-      console.log('📊 === CALCULATION DETAILS ===');
-      console.log(`Total Price: ₹${payload.pricePerKg * payload.totalWeight}`);
-      console.log(`Images Count: ${payload.images.length}`);
-      console.log('='.repeat(40));
+  
 
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      console.log('✅ Form submitted successfully!');
-      alert('✅ Form submitted successfully! Check console for data.');
+
+
 
       reset();
       setPreviewImages([]);

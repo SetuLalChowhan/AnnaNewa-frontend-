@@ -1,31 +1,12 @@
 "use client";
 
+import ErrorHandler from "@/components/common/ErrorHandler";
 import { useAuth } from "@/hooks/useAuth";
-import useClient from "@/hooks/useClient";
-
-import React, { useEffect } from "react";
+import useMutationClient from "@/hooks/useMutationClient";
+import { useValueStore } from "@/providers/useState";
+import { Loader } from "lucide-react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
-type Address = {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-};
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
-  isVerified: boolean;
-  profilePicture?: {
-    url?: string;
-  };
-  address: Address;
-};
 
 type FormValues = {
   name: string;
@@ -39,7 +20,15 @@ type FormValues = {
 };
 
 const page = () => {
-  const { userData: user  ,isLoading} = useAuth();
+  const { userData: user } = useAuth();
+
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [isImageModified, setIsImageModified] = useState(false);
+
+  const { apiError, setApiError } = useValueStore();
+  const hiddenFileInput = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
@@ -58,28 +47,147 @@ const page = () => {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log("✅ SETTINGS FORM DATA:", data);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setProfileImage(file);
+    setPreviewImage(URL.createObjectURL(file));
+    setIsImageModified(true);
   };
 
-  const hasProfilePicture = !!user?.profilePicture?.url;
+  const removeImage = () => {
+    setProfileImage(null);
+    setPreviewImage(null);
+    setIsImageModified(false);
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.value = "";
+    }
+  };
+
+  const handleAvatarClick = () => {
+    hiddenFileInput.current?.click();
+  };
+
+  const hasOldImage = user?.profilePicture?.url && !previewImage;
+
+  const updateProfileMutation = useMutationClient({
+    url: `/auth/profile`,
+    method: "put",
+    isPrivate: true,
+    successMessage: "Profile updated!",
+    invalidateKeys: [["userProfile"]],
+   
+  });
+
+  const profileImageMutation = useMutationClient({
+    url: `/auth/profile/picture`,
+    method: "put",
+    isPrivate: true,
+    successMessage: "Profile updated!",
+    invalidateKeys: [["userProfile"]],
+  
+  });
+
+  const handleUploadImage = async () => {
+    if (!profileImage) return;
+
+    setIsImageUploading(true);
+    const formData = new FormData();
+    formData.append("profilePicture", profileImage);
+
+    profileImageMutation.mutate(
+      {
+        data: formData,
+        config: { headers: { "Content-Type": "multipart/form-data" } },
+      },
+      {
+        onSuccess: () => {
+          setIsImageModified(false);
+          setIsImageUploading(false);
+          setProfileImage(null);
+          setPreviewImage(null);
+          if (hiddenFileInput.current) {
+            hiddenFileInput.current.value = "";
+          }
+        },
+        onError: () => {
+          setIsImageUploading(false);
+        },
+      }
+    );
+  };
+
+  const onSubmit = (data: FormValues) => {
+    const payload = {
+      name: data.name,
+      phone: data.phone,
+      address: {
+        street: data.street,
+        city: data.city,
+        state: data.state,
+        zipCode: data.zipCode,
+      },
+    };
+
+    updateProfileMutation.mutate({ data: payload });
+  };
 
   return (
-    <div className=" text-black!">
-      <div className="bg-white w-full  rounded-xl shadow-md p-6">
+    <div className="text-black!">
+      <div className="bg-white w-full rounded-xl shadow-md p-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          {hasProfilePicture ? (
-            <img
-              src={user.profilePicture?.url}
-              alt="Profile"
-              className="w-16 h-16 object-cover rounded-full border"
-            />
-          ) : (
-            <div className="w-16 h-16 rounded-full bg-primaryColor text-white flex items-center justify-center text-xl">
-              {user?.name?.charAt(0)}
+          <div className="relative">
+            <div
+              onClick={handleAvatarClick}
+              className="cursor-pointer group relative"
+            >
+              {isImageUploading && (
+                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center z-10">
+                  <Loader className="animate-spin text-white" size={20} />
+                </div>
+              )}
+
+              {previewImage ? (
+                <img
+                  src={previewImage}
+                  className="w-20 h-20 rounded-full object-cover border shadow-sm transition group-hover:opacity-90"
+                />
+              ) : hasOldImage ? (
+                <img
+                  src={user.profilePicture.url}
+                  className="w-20 h-20 rounded-full object-cover border shadow-sm transition group-hover:opacity-90"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-primaryColor text-white flex items-center justify-center text-2xl shadow-sm cursor-pointer group-hover:opacity-90">
+                  {user?.name?.charAt(0)}
+                </div>
+              )}
+
+              <div className="absolute inset-0 rounded-full bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition">
+                Change
+              </div>
             </div>
-          )}
+
+            {previewImage && (
+              <button
+                onClick={removeImage}
+                disabled={isImageUploading}
+                className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs disabled:opacity-50"
+              >
+                X
+              </button>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              ref={hiddenFileInput}
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </div>
 
           <div>
             <h2 className="text-xl font-bold text-primaryColor">
@@ -92,10 +200,35 @@ const page = () => {
                 {user?.role}
               </span>
             </p>
+            {isImageModified && (
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={handleUploadImage}
+                  disabled={isImageUploading}
+                  className="text-xs bg-primaryColor text-white px-3 py-1 rounded-md hover:opacity-90 disabled:opacity-50 flex items-center gap-1"
+                >
+                  {isImageUploading ? (
+                    <>
+                      <Loader size={12} className="animate-spin" />
+                      Uploading
+                    </>
+                  ) : (
+                    "Save Image"
+                  )}
+                </button>
+                <button
+                  onClick={removeImage}
+                  disabled={isImageUploading}
+                  className="text-xs bg-gray-400 text-white px-3 py-1 rounded-md hover:opacity-90 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Form */}
+        {/* FORM */}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -105,11 +238,15 @@ const page = () => {
             register={register("name", { required: true })}
             error={errors.name}
           />
+
+          {/* EMAIL DISABLED */}
           <Input
             label="Email"
-            register={register("email", { required: true })}
+            register={register("email")}
             error={errors.email}
+            disabled={true}
           />
+
           <Input
             label="Phone"
             register={register("phone")}
@@ -140,12 +277,20 @@ const page = () => {
           <div className="col-span-full mt-4">
             <button
               type="submit"
-              className="bg-primaryColor text-white w-full py-2 rounded-md font-semibold hover:opacity-90"
+              className="bg-primaryColor text-white w-full py-2 rounded-md font-semibold hover:opacity-90 flex justify-center items-center"
             >
-              Save Settings
+              {updateProfileMutation.isPending ? (
+                <Loader className="animate-spin text-white" size={24} />
+              ) : (
+                "Save Changes"
+              )}
             </button>
           </div>
         </form>
+
+        {apiError && (
+          <ErrorHandler message={apiError} onClose={() => setApiError("")} />
+        )}
       </div>
     </div>
   );
@@ -157,21 +302,25 @@ type InputProps = {
   label: string;
   register: any;
   error: any;
+  disabled?: boolean;
 };
 
-const Input = ({ label, register, error }: InputProps) => {
-  return (
-    <div>
-      <label className="block text-sm font-medium mb-1 text-primaryColor">
-        {label}
-      </label>
-      <input
-        {...register}
-        className="w-full border border-none bg-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primaryColor"
-      />
-      {error && (
-        <p className="text-red-500 text-xs mt-1">This field is required</p>
-      )}
-    </div>
-  );
-};
+const Input = ({ label, register, error, disabled = false }: InputProps) => (
+  <div>
+    <label className="block text-sm font-medium mb-1 text-primaryColor">
+      {label}
+    </label>
+
+    <input
+      {...register}
+      disabled={disabled}
+      className={`w-full bg-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primaryColor 
+        ${disabled ? "opacity-60 cursor-not-allowed" : ""}
+      `}
+    />
+
+    {error && !disabled && (
+      <p className="text-red-500 text-xs mt-1">This field is required</p>
+    )}
+  </div>
+);

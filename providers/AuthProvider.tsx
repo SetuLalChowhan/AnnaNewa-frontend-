@@ -26,7 +26,7 @@ export const AuthProvider = ({
 }: AuthProviderProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(initialData || null);
+
   const {
     data: userData,
     refetch: userRefetch,
@@ -37,14 +37,15 @@ export const AuthProvider = ({
     queryFn: async () => {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-      setUser(res.data.user);
+
       return res.data.user;
     },
     initialData: initialData || undefined,
+    refetchOnMount: false, // 🔥 ADD THIS
+    refetchOnWindowFocus: false, // 🔥 ADD THIS
+    staleTime: Infinity, // 🔥 ADD THIS
   });
 
   const logout = async () => {
@@ -59,7 +60,7 @@ export const AuthProvider = ({
 
       queryClient.removeQueries({ queryKey: ["userProfile"] });
       router.push("/login");
-      setUser(null);
+
       toast.success("Logout successful");
     } catch (err) {
       console.error("Logout failed:", err);
@@ -68,8 +69,7 @@ export const AuthProvider = ({
 
   const contextValue = {
     userData,
-    user,
-    setUser,
+
     userRefetch,
     isLoading,
     isFetching,

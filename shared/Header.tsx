@@ -21,7 +21,11 @@ const Header = () => {
   const [isOpen, setOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
   const pathname = usePathname();
-  const { userData ,user} = useAuth();
+  const { userData } = useAuth();
+
+  const user = userData
+
+  
 
   // Function to check if link is active
   const isActive = (href: string) => {

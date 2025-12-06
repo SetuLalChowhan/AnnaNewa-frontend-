@@ -23,7 +23,7 @@ const AllArticleSection = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  // 🔥 Console logs whenever filter changes
+
 
   return (
     <div className="section-padding-x section-padding-y flex flex-col gap-10">
