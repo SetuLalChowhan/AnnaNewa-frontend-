@@ -77,7 +77,7 @@ const page = () => {
     isPrivate: true,
     successMessage: "Profile updated!",
     invalidateKeys: [["userProfile"]],
-   
+    isLogin: true,
   });
 
   const profileImageMutation = useMutationClient({
@@ -86,7 +86,7 @@ const page = () => {
     isPrivate: true,
     successMessage: "Profile updated!",
     invalidateKeys: [["userProfile"]],
-  
+    isLogin: true,
   });
 
   const handleUploadImage = async () => {

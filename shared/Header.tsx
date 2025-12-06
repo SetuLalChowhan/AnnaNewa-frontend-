@@ -21,9 +21,7 @@ const Header = () => {
   const [isOpen, setOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
   const pathname = usePathname();
-  const { userData } = useAuth();
-
-  const user = userData
+  const { userData ,user} = useAuth();
 
   
 
