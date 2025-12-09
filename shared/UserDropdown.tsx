@@ -27,7 +27,9 @@ interface UserDropdownProps {
 const UserDropdown: React.FC<UserDropdownProps> = ({ className = "" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const { userData: user, logout } = useAuth();
+  const { user, logout } = useAuth();
+
+  
 
   const logoutMutation = useMutationClient({
     url: `/auth/logout`,

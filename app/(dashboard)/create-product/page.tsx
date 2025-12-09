@@ -1,8 +1,12 @@
-'use client';
-
-import React, { useState, FC, ChangeEvent } from 'react';
-import { useForm, Controller, SubmitHandler, FieldError } from 'react-hook-form';
-import { X, Upload, Calendar } from 'lucide-react';
+"use client";
+import React, { useState, FC, ChangeEvent } from "react";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { X, Upload, Calendar, Loader } from "lucide-react";
+import useMutationClient from "@/hooks/useMutationClient";
+import { useValueStore } from "@/providers/useState";
+import ErrorHandler from "@/components/common/ErrorHandler";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 // Types
 interface LocationData {
@@ -12,38 +16,16 @@ interface LocationData {
   zipCode: string;
 }
 
-interface ImagePreview {
-  name: string;
-  preview: string;
-  file: File;
-}
-
 interface ProductFormData {
   title: string;
   description: string;
   pricePerKg: string;
   totalWeight: string;
-  category: 'fruits' | 'vegetables' | 'grains' | 'dairy' | 'others';
-  expiryDate: string;
-  postType: 'sell' | 'buy';
-  location: LocationData;
-  images: File[];
-}
-
-interface BackendPayload {
-  title: string;
-  description: string;
-  pricePerKg: number;
-  totalWeight: number;
   category: string;
   expiryDate: string;
-  postType: string;
+  postType: "sell" | "buy";
   location: LocationData;
-  images: Array<{
-    name: string;
-    size: number;
-    type: string;
-  }>;
+  images: File[];
 }
 
 interface CalendarInputProps {
@@ -52,7 +34,7 @@ interface CalendarInputProps {
   error?: string;
 }
 
-const PRIMARY_COLOR = '#10b981';
+const PRIMARY_COLOR = "#10b981";
 
 const CalendarInput: FC<CalendarInputProps> = ({ value, onChange, error }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -60,25 +42,21 @@ const CalendarInput: FC<CalendarInputProps> = ({ value, onChange, error }) => {
     value ? new Date(value) : new Date()
   );
 
-  const getDaysInMonth = (date: Date): number => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  };
+  const getDaysInMonth = (date: Date): number =>
+    new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 
-  const getFirstDayOfMonth = (date: Date): number => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  };
+  const getFirstDayOfMonth = (date: Date): number =>
+    new Date(date.getFullYear(), date.getMonth(), 1).getDay();
 
-  const handlePrevMonth = (): void => {
+  const handlePrevMonth = (): void =>
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
     );
-  };
 
-  const handleNextMonth = (): void => {
+  const handleNextMonth = (): void =>
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
     );
-  };
 
   const handleSelectDate = (day: number): void => {
     const selectedDate = new Date(
@@ -86,87 +64,95 @@ const CalendarInput: FC<CalendarInputProps> = ({ value, onChange, error }) => {
       currentMonth.getMonth(),
       day
     );
-    const formattedDate = selectedDate.toISOString().split('T')[0];
+    const formattedDate = selectedDate.toISOString().split("T")[0];
     onChange(formattedDate);
     setIsOpen(false);
   };
 
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   const daysInMonth = getDaysInMonth(currentMonth);
   const firstDay = getFirstDayOfMonth(currentMonth);
-  const days: (number | null)[] = Array(firstDay).fill(null).concat(
-    Array.from({ length: daysInMonth }, (_, i) => i + 1)
-  );
+  const days: (number | null)[] = Array(firstDay)
+    .fill(null)
+    .concat(Array.from({ length: daysInMonth }, (_, i) => i + 1));
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const formattedValue = value
-    ? new Date(value).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-    : '';
+    ? new Date(value).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "";
 
   return (
     <div className="relative">
       <div
-        className="w-full px-4 py-3 border rounded-lg flex items-center justify-between cursor-pointer hover:border-gray-400 transition"
+        className="w-full px-3 py-2.5 border rounded-md flex items-center justify-between cursor-pointer hover:border-gray-300 transition"
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          backgroundColor: isOpen ? `${PRIMARY_COLOR}05` : 'white',
-          borderColor: error ? '#dc2626' : '#d1d5db'
+          backgroundColor: isOpen ? `${PRIMARY_COLOR}05` : "white",
+          borderColor: error ? "#ef4444" : "#d1d5db",
         }}
       >
-        <span className={formattedValue ? 'text-gray-900 font-medium' : 'text-gray-400'}>
-          {formattedValue || 'Select expiry date'}
+        <span className={formattedValue ? "text-gray-800" : "text-gray-400"}>
+          {formattedValue || "Select expiry date"}
         </span>
-        <Calendar className="w-5 h-5" style={{ color: PRIMARY_COLOR }} />
+        <Calendar className="w-4 h-4" style={{ color: PRIMARY_COLOR }} />
       </div>
 
       {isOpen && (
-        <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 p-4 w-full max-w-sm">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
+        <div className="absolute top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3 w-full max-w-xs">
+          <div className="flex items-center justify-between mb-3">
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="p-2 hover:bg-gray-100 rounded-lg transition font-bold text-lg"
+              className="p-1.5 hover:bg-gray-100 rounded transition text-sm"
             >
               ←
             </button>
-            <h3 className="font-bold text-gray-800">
+            <h3 className="font-medium text-gray-800 text-sm">
               {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
             </h3>
             <button
               type="button"
               onClick={handleNextMonth}
-              className="p-2 hover:bg-gray-100 rounded-lg transition font-bold text-lg"
+              className="p-1.5 hover:bg-gray-100 rounded transition text-sm"
             >
               →
             </button>
           </div>
 
-          {/* Day Headers */}
-          <div className="grid grid-cols-7 gap-2 mb-3">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-              <div key={day} className="text-center text-xs font-bold text-gray-600">
+          <div className="grid grid-cols-7 gap-1 mb-2">
+            {["S", "M", "T", "W", "T", "F", "S"].map((day, idx) => (
+              <div
+                key={`${day}-${idx}`}
+                className="text-center text-xs text-gray-500 font-medium"
+              >
                 {day}
               </div>
             ))}
           </div>
 
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-2 mb-4">
+          <div className="grid grid-cols-7 gap-1 mb-3">
             {days.map((day, idx) => {
-              if (!day) {
-                return <div key={`empty-${idx}`} className="p-2" />;
-              }
+              if (!day) return <div key={`empty-${idx}`} className="p-1" />;
 
               const dateForDay = new Date(
                 currentMonth.getFullYear(),
@@ -176,11 +162,15 @@ const CalendarInput: FC<CalendarInputProps> = ({ value, onChange, error }) => {
               dateForDay.setHours(0, 0, 0, 0);
 
               const isCurrentDay = dateForDay.getTime() === today.getTime();
-              const isSelectedDay = value === new Date(
-                currentMonth.getFullYear(),
-                currentMonth.getMonth(),
-                day
-              ).toISOString().split('T')[0];
+              const isSelectedDay =
+                value ===
+                new Date(
+                  currentMonth.getFullYear(),
+                  currentMonth.getMonth(),
+                  day
+                )
+                  .toISOString()
+                  .split("T")[0];
               const isDisabled = dateForDay < today;
 
               return (
@@ -189,14 +179,14 @@ const CalendarInput: FC<CalendarInputProps> = ({ value, onChange, error }) => {
                   type="button"
                   onClick={() => !isDisabled && handleSelectDate(day)}
                   disabled={isDisabled}
-                  className={`p-2 rounded text-sm font-medium transition ${
+                  className={`p-1.5 rounded text-xs transition ${
                     isDisabled
-                      ? 'text-gray-300 cursor-not-allowed'
+                      ? "text-gray-300 cursor-not-allowed"
                       : isSelectedDay
-                      ? 'text-white font-bold'
+                      ? "text-white"
                       : isCurrentDay
-                      ? 'text-gray-700 border-2'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? "text-gray-800 border"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                   style={
                     isSelectedDay
@@ -212,42 +202,46 @@ const CalendarInput: FC<CalendarInputProps> = ({ value, onChange, error }) => {
             })}
           </div>
 
-          {/* Close Button */}
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition"
+            className="w-full px-3 py-1.5 bg-gray-50 text-gray-700 rounded text-sm hover:bg-gray-100 transition"
           >
             Close
           </button>
         </div>
       )}
 
-      {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };
 
 const ProductForm: FC = () => {
-  const [previewImages, setPreviewImages] = useState<ImagePreview[]>([]);
+  const [images, setImages] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
+  const { apiError, setApiError } = useValueStore();
 
-  const { control, handleSubmit, formState: { errors }, reset } = useForm<ProductFormData>({
-    mode: 'onChange',
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ProductFormData>({
+    mode: "onChange",
     defaultValues: {
-      title: 'Banana',
-      description: 'Fresh organic tomatoes from our farm',
-      pricePerKg: '50',
-      totalWeight: '50',
-      category: 'fruits',
-      expiryDate: '2025-12-31',
-      postType: 'sell',
+      title: "",
+      description: "",
+      pricePerKg: "",
+      totalWeight: "",
+      category: "",
+      expiryDate: "",
+      postType: "sell",
       location: {
-        address: 'Farm Road 123',
-        city: 'Pune',
-        state: 'Maharashtra',
-        zipCode: '411001',
+        address: "",
+        city: "",
+        state: "",
+        zipCode: "",
       },
       images: [],
     },
@@ -258,132 +252,118 @@ const ProductForm: FC = () => {
 
     if (files.length === 0) return;
 
-    if (previewImages.length + files.length > 5) {
-      setError('Maximum 5 images allowed');
+    if (images.length + files.length > 5) {
+      setError("Maximum 5 images allowed");
       return;
     }
 
-    setError('');
-
-    files.forEach((file: File) => {
-      if (!file.type.startsWith('image/')) {
-        setError('Only image files are allowed');
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        setError("Only image files are allowed");
         return;
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        setError('Image size must be less than 5MB');
+        setError("Image size must be less than 5MB");
         return;
       }
+    }
 
-      const reader = new FileReader();
-      reader.onload = (event: ProgressEvent<FileReader>): void => {
-        const result = event.target?.result as string;
-        setPreviewImages((prev: ImagePreview[]) => [
-          ...prev,
-          {
-            name: file.name,
-            preview: result,
-            file: file,
-          },
-        ]);
-      };
-      reader.onerror = (): void => {
-        setError('Failed to read file');
-      };
-      reader.readAsDataURL(file);
-    });
+    setError("");
+    setImages((prev) => [...prev, ...files]);
   };
 
   const removeImage = (index: number): void => {
-    setPreviewImages((prev: ImagePreview[]) =>
-      prev.filter((_: ImagePreview, i: number) => i !== index)
-    );
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const onSubmit: SubmitHandler<ProductFormData> = async (
-    data: ProductFormData
-  ): Promise<void> => {
+  const createProduct = useMutationClient({
+    url: `/product`,
+    method: "post",
+    isPrivate: true,
+    successMessage: "Product created!",
+    invalidateKeys: [["products"]],
+  });
+
+  const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      if (previewImages.length === 0) {
-        setError('Please upload at least one image');
+      if (images.length === 0) {
+        setError("Please upload at least one image");
         setIsLoading(false);
         return;
       }
 
-      const payload: BackendPayload = {
-        title: data.title.trim(),
-        description: data.description.trim(),
-        pricePerKg: parseFloat(data.pricePerKg),
-        totalWeight: parseFloat(data.totalWeight),
-        category: data.category,
-        expiryDate: data.expiryDate,
-        postType: data.postType,
-        location: {
+      const formData = new FormData();
+      formData.append("title", data.title.trim());
+      formData.append("description", data.description.trim());
+      formData.append("pricePerKg", data.pricePerKg);
+      formData.append("totalWeight", data.totalWeight);
+      formData.append("category", data.category);
+      formData.append("expiryDate", data.expiryDate);
+      formData.append("postType", data.postType);
+      formData.append(
+        "location",
+        JSON.stringify({
           address: data.location.address.trim(),
           city: data.location.city.trim(),
           state: data.location.state.trim(),
           zipCode: data.location.zipCode.trim(),
-        },
-        images: previewImages.map((img: ImagePreview) => ({
-          name: img.name,
-          size: img.file.size,
-          type: img.file.type,
-        })),
-      };
+        })
+      );
 
-  
+      images.forEach((file) => {
+        formData.append("images", file);
+      });
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-
-
-
-      reset();
-      setPreviewImages([]);
+      createProduct.mutate({
+        data: formData,
+        config: { headers: { "Content-Type": "multipart/form-data" } },
+      });
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : "An error occurred";
       setError(errorMessage);
-      console.error('❌ Submission Error:', err);
+      console.error("❌ Submission Error:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen text-black" >
+    <div className=" text-black ">
       <div className="">
-        <div className="bg-white rounded-xl shadow-xl p-6 md:p-8 border border-gray-100">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2" style={{ color: PRIMARY_COLOR }}>
-              Product Listing
+        <div className="">
+          <div className="mb-6">
+            <h1 className="text-2xl font-semibold text-gray-900 mb-1">
+              List a Product
             </h1>
-            <p className="text-gray-600 text-lg">List your fresh farm products for sale</p>
+            <p className="text-gray-600 text-sm">
+              Create a new product listing for your farm
+            </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 rounded-lg flex items-start gap-3" style={{ borderLeftColor: '#dc2626' }}>
-           
-              <p className="text-red-700">{error}</p>
+            <div className="mb-4 p-3 bg-red-50 rounded border border-red-200">
+              <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
 
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Title */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Product Title *
               </label>
               <Controller
                 name="title"
                 control={control}
                 rules={{
-                  required: 'Title is required',
-                  minLength: { value: 3, message: 'Minimum 3 characters' },
-                  maxLength: { value: 100, message: 'Maximum 100 characters' },
+                  required: "Title is required",
+                  minLength: { value: 3, message: "Minimum 3 characters" },
+                  maxLength: { value: 100, message: "Maximum 100 characters" },
                 }}
                 render={({ field }) => (
                   <>
@@ -391,11 +371,12 @@ const ProductForm: FC = () => {
                       {...field}
                       type="text"
                       placeholder="Enter product title"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition"
-                      style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
                     />
                     {errors.title && (
-                      <p className="text-red-600 text-sm mt-1">{errors.title.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.title.message}
+                      </p>
                     )}
                   </>
                 )}
@@ -404,28 +385,32 @@ const ProductForm: FC = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Description *
               </label>
+
               <Controller
                 name="description"
                 control={control}
                 rules={{
-                  required: 'Description is required',
-                  minLength: { value: 10, message: 'Minimum 10 characters' },
-                  maxLength: { value: 500, message: 'Maximum 500 characters' },
+                  required: "Description is required",
+                  minLength: { value: 10, message: "Minimum 10 characters" },
+                  maxLength: { value: 500, message: "Maximum 500 characters" },
                 }}
                 render={({ field }) => (
                   <>
-                    <textarea
-                      {...field}
-                      placeholder="Describe your product in detail"
-                      rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition resize-none"
-                      style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
+                    <ReactQuill
+                      theme="snow"
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Describe your product in detail..."
+                      className="bg-white h-48  "
                     />
+
                     {errors.description && (
-                      <p className="text-red-600 text-sm mt-1">{errors.description.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.description.message}
+                      </p>
                     )}
                   </>
                 )}
@@ -433,33 +418,37 @@ const ProductForm: FC = () => {
             </div>
 
             {/* Price and Weight */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mt-24">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Price per KG (₹) *
                 </label>
                 <Controller
                   name="pricePerKg"
                   control={control}
                   rules={{
-                    required: 'Price is required',
-                    pattern: { value: /^\d+(\.\d{1,2})?$/, message: 'Invalid price format' },
+                    required: "Price is required",
+                    pattern: {
+                      value: /^\d+(\.\d{1,2})?$/,
+                      message: "Invalid price format",
+                    },
                     validate: (value) =>
-                      parseFloat(value) > 0 || 'Price must be greater than 0',
+                      parseFloat(value) > 0 || "Price must be greater than 0",
                   }}
                   render={({ field }) => (
                     <>
                       <input
                         {...field}
                         type="number"
-                        placeholder="50"
+                        placeholder="Enter price per KG"
                         step="0.01"
                         min="0"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition"
-                        style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
                       />
                       {errors.pricePerKg && (
-                        <p className="text-red-600 text-sm mt-1">{errors.pricePerKg.message}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.pricePerKg.message}
+                        </p>
                       )}
                     </>
                   )}
@@ -467,31 +456,35 @@ const ProductForm: FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Total Weight (KG) *
                 </label>
                 <Controller
                   name="totalWeight"
                   control={control}
                   rules={{
-                    required: 'Weight is required',
-                    pattern: { value: /^\d+(\.\d{1,2})?$/, message: 'Invalid weight format' },
+                    required: "Weight is required",
+                    pattern: {
+                      value: /^\d+(\.\d{1,2})?$/,
+                      message: "Invalid weight format",
+                    },
                     validate: (value) =>
-                      parseFloat(value) > 0 || 'Weight must be greater than 0',
+                      parseFloat(value) > 0 || "Weight must be greater than 0",
                   }}
                   render={({ field }) => (
                     <>
                       <input
                         {...field}
                         type="number"
-                        placeholder="50"
+                        placeholder="Enter total weight"
                         step="0.01"
                         min="0"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition"
-                        style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
                       />
                       {errors.totalWeight && (
-                        <p className="text-red-600 text-sm mt-1">{errors.totalWeight.message}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.totalWeight.message}
+                        </p>
                       )}
                     </>
                   )}
@@ -499,101 +492,107 @@ const ProductForm: FC = () => {
               </div>
             </div>
 
-            {/* Category */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Category *
-              </label>
-              <Controller
-                name="category"
-                control={control}
-                rules={{ required: 'Category is required' }}
-                render={({ field }) => (
-                  <>
-                    <select
-                      {...field}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition"
-                      style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
-                    >
-                      <option value="fruits">Fruits</option>
-                      <option value="vegetables"> Vegetables</option>
-                      <option value="grains">Grains</option>
-                      <option value="dairy">Dairy</option>
-                      <option value="others">Others</option>
-                    </select>
-                    {errors.category && (
-                      <p className="text-red-600 text-sm mt-1">{errors.category.message}</p>
-                    )}
-                  </>
-                )}
-              />
-            </div>
+            {/* Category and Expiry */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Category *
+                </label>
+                <Controller
+                  name="category"
+                  control={control}
+                  rules={{ required: "Category is required" }}
+                  render={({ field }) => (
+                    <>
+                      <select
+                        {...field}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
+                      >
+                        <option value="fruits">Fruits</option>
+                        <option value="vegetables">Vegetables</option>
+                        <option value="grains">Grains</option>
+                        <option value="dairy">Dairy</option>
+                        <option value="others">Others</option>
+                      </select>
+                      {errors.category && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.category.message}
+                        </p>
+                      )}
+                    </>
+                  )}
+                />
+              </div>
 
-            {/* Expiry Date - Custom Calendar */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Expiry Date *
-              </label>
-              <Controller
-                name="expiryDate"
-                control={control}
-                rules={{
-                  required: 'Expiry date is required',
-                  validate: (value: string) => {
-                    if (!value) return 'Expiry date is required';
-                    const expiry = new Date(value);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    expiry.setHours(0, 0, 0, 0);
-                    return expiry > today || 'Expiry date must be in the future';
-                  },
-                }}
-                render={({ field }) => (
-                  <CalendarInput
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    error={errors.expiryDate?.message}
-                  />
-                )}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Expiry Date *
+                </label>
+                <Controller
+                  name="expiryDate"
+                  control={control}
+                  rules={{
+                    required: "Expiry date is required",
+                    validate: (value: string) => {
+                      if (!value) return "Expiry date is required";
+                      const expiry = new Date(value);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      expiry.setHours(0, 0, 0, 0);
+                      return expiry > today || "Must be in the future";
+                    },
+                  }}
+                  render={({ field }) => (
+                    <CalendarInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      error={errors.expiryDate?.message}
+                    />
+                  )}
+                />
+              </div>
             </div>
 
             {/* Post Type */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Post Type *
               </label>
               <Controller
                 name="postType"
                 control={control}
                 render={({ field }) => (
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition"
-                      style={{
-                        borderColor: field.value === 'sell' ? PRIMARY_COLOR : '#e5e7eb',
-                        backgroundColor: field.value === 'sell' ? `${PRIMARY_COLOR}10` : 'white'
-                      }}>
+                  <div className="flex gap-3">
+                    <label
+                      className={`flex-1 px-3 py-2 border rounded-md cursor-pointer transition text-sm text-center ${
+                        field.value === "sell"
+                          ? "border-emerald-500 bg-emerald-50"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
                       <input
                         {...field}
                         type="radio"
                         value="sell"
-                        checked={field.value === 'sell'}
-                        className="w-4 h-4 cursor-pointer"
+                        checked={field.value === "sell"}
+                        className="hidden"
                       />
-                      <span className="text-gray-700 font-medium">Sell</span>
+                      Sell
                     </label>
-                    <label className="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition"
-                      style={{
-                        borderColor: field.value === 'buy' ? PRIMARY_COLOR : '#e5e7eb',
-                        backgroundColor: field.value === 'buy' ? `${PRIMARY_COLOR}10` : 'white'
-                      }}>
+                    <label
+                      className={`flex-1 px-3 py-2 border rounded-md cursor-pointer transition text-sm text-center ${
+                        field.value === "buy"
+                          ? "border-emerald-500 bg-emerald-50"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
                       <input
                         {...field}
                         type="radio"
                         value="buy"
-                        className="w-4 h-4 cursor-pointer"
+                        className="hidden"
                       />
-                      <span className="text-gray-700 font-medium">Buy</span>
+                      Buy
                     </label>
                   </div>
                 )}
@@ -601,62 +600,70 @@ const ProductForm: FC = () => {
             </div>
 
             {/* Location */}
-            <div className="space-y-4 p-5 bg-linear-to-b from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-              <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
-                📍 Location Details
+            <div className="space-y-4 p-4  rounded-lg ">
+              <h3 className="font-medium text-gray-800 text-sm">
+                Location Details
               </h3>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
                   Address *
                 </label>
                 <Controller
                   name="location.address"
                   control={control}
                   rules={{
-                    required: 'Address is required',
-                    minLength: { value: 5, message: 'Address must be at least 5 characters' },
+                    required: "Address is required",
+                    minLength: {
+                      value: 5,
+                      message: "Minimum 5 characters",
+                    },
                   }}
                   render={({ field }) => (
                     <>
                       <input
                         {...field}
                         type="text"
-                        placeholder="Farm Road 123"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition bg-white"
-                        style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
+                        placeholder="Enter your address"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
                       />
                       {errors.location?.address && (
-                        <p className="text-red-600 text-sm mt-1">{errors.location.address.message}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.location.address.message}
+                        </p>
                       )}
                     </>
                   )}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     City *
                   </label>
                   <Controller
                     name="location.city"
                     control={control}
                     rules={{
-                      required: 'City is required',
-                      minLength: { value: 2, message: 'City must be at least 2 characters' },
+                      required: "City is required",
+                      minLength: {
+                        value: 2,
+                        message: "Minimum 2 characters",
+                      },
                     }}
                     render={({ field }) => (
                       <>
                         <input
                           {...field}
                           type="text"
-                          placeholder="Pune"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition bg-white"
-                          style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
+                          placeholder="Enter your city"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
                         />
                         {errors.location?.city && (
-                          <p className="text-red-600 text-sm mt-1">{errors.location.city.message}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.location.city.message}
+                          </p>
                         )}
                       </>
                     )}
@@ -664,27 +671,31 @@ const ProductForm: FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     State *
                   </label>
                   <Controller
                     name="location.state"
                     control={control}
                     rules={{
-                      required: 'State is required',
-                      minLength: { value: 2, message: 'State must be at least 2 characters' },
+                      required: "State is required",
+                      minLength: {
+                        value: 2,
+                        message: "Minimum 2 characters",
+                      },
                     }}
                     render={({ field }) => (
                       <>
                         <input
                           {...field}
                           type="text"
-                          placeholder="Maharashtra"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition bg-white"
-                          style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
+                          placeholder="Enter your state"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
                         />
                         {errors.location?.state && (
-                          <p className="text-red-600 text-sm mt-1">{errors.location.state.message}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.location.state.message}
+                          </p>
                         )}
                       </>
                     )}
@@ -693,28 +704,28 @@ const ProductForm: FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
                   Zip Code *
                 </label>
                 <Controller
                   name="location.zipCode"
                   control={control}
                   rules={{
-                    required: 'Zip Code is required',
-                    pattern: { value: /^\d{6}$/, message: '6 digit zip code required' },
+                    required: "Zip Code is required",
                   }}
                   render={({ field }) => (
                     <>
                       <input
                         {...field}
                         type="text"
-                        placeholder="411001"
+                        placeholder=" Enter your zip code"
                         maxLength={6}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition bg-white"
-                        style={{ '--tw-ring-color': PRIMARY_COLOR } as React.CSSProperties}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
                       />
                       {errors.location?.zipCode && (
-                        <p className="text-red-600 text-sm mt-1">{errors.location.zipCode.message}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.location.zipCode.message}
+                        </p>
                       )}
                     </>
                   )}
@@ -724,13 +735,10 @@ const ProductForm: FC = () => {
 
             {/* Image Upload */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Product Images (Maximum 5) *
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Images *
               </label>
-              <div
-                className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition hover:opacity-80"
-                style={{ borderColor: PRIMARY_COLOR, backgroundColor: `${PRIMARY_COLOR}05` }}
-              >
+              <div className="border border-dashed border-gray-300 rounded-md p-6 text-center hover:border-gray-400 transition cursor-pointer bg-white">
                 <input
                   type="file"
                   multiple
@@ -740,35 +748,52 @@ const ProductForm: FC = () => {
                   id="image-input"
                 />
                 <label htmlFor="image-input" className="cursor-pointer">
-                  <Upload className="w-10 h-10 mx-auto mb-3" style={{ color: PRIMARY_COLOR }} />
-                  <p className="text-gray-700 font-semibold text-lg">Click to upload images</p>
-                  <p className="text-gray-500 text-sm">PNG, JPG, GIF up to 5MB (Max 5 images)</p>
+                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-gray-700 text-sm font-medium">
+                    Click to upload images
+                  </p>
+                  <p className="text-gray-500 text-xs mt-1">
+                    Max 5 images • 5MB each
+                  </p>
                 </label>
               </div>
             </div>
 
             {/* Image Preview */}
-            {previewImages.length > 0 && (
+            {images.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  🖼️ Preview ({previewImages.length}/5)
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {previewImages.map((img: ImagePreview, index: number) => (
-                    <div key={`${img.name}-${index}`} className="relative group">
-                      <img
-                        src={img.preview}
-                        alt={`Preview ${index}`}
-                        className="w-full h-24 object-cover rounded-lg border-2 border-gray-200 group-hover:border-gray-300 transition"
-                      />
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium text-gray-700">
+                    Images ({images.length}/5)
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => setImages([])}
+                    className="text-xs text-gray-500 hover:text-gray-700"
+                  >
+                    Clear all
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {images.map((file, index) => (
+                    <div
+                      key={`${file.name}-${index}`}
+                      className="relative group"
+                    >
+                      <div className="aspect-square overflow-hidden rounded border border-gray-200">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${index}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition"
+                        />
+                      </div>
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg hover:bg-red-600"
+                        className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-sm hover:shadow transition"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3 text-gray-600" />
                       </button>
-                      <p className="text-xs text-gray-600 mt-1 truncate">{img.name}</p>
                     </div>
                   ))}
                 </div>
@@ -777,14 +802,27 @@ const ProductForm: FC = () => {
 
             {/* Submit Button */}
             <button
-              onClick={handleSubmit(onSubmit)}
-              disabled={isLoading}
-              className="w-full py-4 rounded-lg font-semibold text-white transition disabled:opacity-50 hover:shadow-xl text-lg"
-              style={{ backgroundColor: PRIMARY_COLOR }}
+              type="submit"
+              disabled={isLoading || createProduct.isPending}
+              className="w-full py-2.5 bg-emerald-600 text-white rounded-md font-medium hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
-              {isLoading ? 'Submitting...' : 'List Product'}
+              {createProduct.isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader className="w-4 h-4 animate-spin" />
+                  Creating...
+                </span>
+              ) : (
+                "Create Listing"
+              )}
             </button>
-          </div>
+
+            {apiError && (
+              <ErrorHandler
+                message={apiError}
+                onClose={() => setApiError("")}
+              />
+            )}
+          </form>
         </div>
       </div>
     </div>

@@ -20,7 +20,7 @@ type FormValues = {
 };
 
 const page = () => {
-  const { userData: user } = useAuth();
+  const {  user } = useAuth();
 
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);

@@ -43,9 +43,7 @@ export const AuthProvider = ({
     return res.data.user;
   },
   initialData : initialData || undefined,
-  refetchOnMount: false,     // 🔥 ADD THIS
-  refetchOnWindowFocus: false, // 🔥 ADD THIS
-  staleTime: Infinity,         // 🔥 ADD THIS
+  
 });
 
   const logout = async () => {

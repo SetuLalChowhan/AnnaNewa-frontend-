@@ -68,7 +68,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
       {/* Sidebar */}
       <div
-        className={`h-full py-8 fixed xl:static flex flex-col gap-8 px-6 w-72 transition-all duration-300 rounded-r-3xl shadow-2xl ${
+        className={`h-full py-8 fixed xl:static flex flex-col gap-8 px-6 w-72 transition-all duration-300 shadow-sm  ${
           open
             ? "left-0 top-0 z-50 bg-white overflow-y-auto border-r border-gray-200"
             : "-left-full"

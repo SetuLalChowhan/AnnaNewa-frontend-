@@ -1,10 +1,11 @@
+export const dynamic = "force-dynamic";  // ✅ disable caching
+
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import StackProvider from "@/providers/StackProvider";
 import { cookies } from "next/headers";
 import axios from "axios";
-
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,22 +20,16 @@ export const metadata: Metadata = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let user = null;
 
   try {
-    // SSR: Get cookie from request
-    const cookieStore = await cookies(); // ✅ already awaitable
+    const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("token")?.value;
-    
 
     if (tokenCookie) {
       const res = await axios.get(`${API_URL}/auth/profile`, {
-        headers: { cookie: `token=${tokenCookie}` }, // send cookie to backend
+        headers: { cookie: `token=${tokenCookie}`  },
         withCredentials: true,
       });
       user = res.data.user || null;
@@ -42,8 +37,6 @@ export default async function RootLayout({
   } catch (err) {
     user = null;
   }
-
-
 
   return (
     <html lang="en">

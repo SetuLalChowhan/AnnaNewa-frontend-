@@ -42,7 +42,7 @@ const useMutationClient = <T = any, V = any>({
   const queryClient = useQueryClient();
   const client = isPrivate ? useAxiosSecure() : useAxiosPublic();
   const { setUser } = useAuth();
-  const { setResetToken } = useValueStore();
+  const { setResetToken ,setApiError} = useValueStore();
 
   const router = useRouter();
   return useMutation<T, any, Payload<V>>({
@@ -65,6 +65,7 @@ const useMutationClient = <T = any, V = any>({
         queryClient.invalidateQueries({ queryKey: key })
       );
       if (redirectTo) router.push(redirectTo);
+      setApiError("");
 
       onSuccess?.(data);
     },
