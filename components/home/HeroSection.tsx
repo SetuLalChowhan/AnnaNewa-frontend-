@@ -35,7 +35,7 @@ const HeroSection = () => {
       </div>
 
       {/* Static Content */}
-      <div className="absolute inset-0 z-10 flex flex-col items-start justify-center section-padding-x section-padding-y text-white">
+      <div className="absolute inset-0 z-10 flex flex-col items-start justify-center px-6 sm:px-12 section-padding-y text-white">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 drop-shadow-lg">
           Connecting Farmers & Buyers Directly
         </h1>
@@ -47,89 +47,19 @@ const HeroSection = () => {
         <div className="flex gap-4">
           <BigButton text="Browse Products" href="#" />
           <BigButton
-            text=" Post Your Product"
+            text="Post Your Product"
             href="#"
-            className="bg-white text-gray-800! hover:bg-gray-200!"
+            className="bg-white text-gray-800! "
           />
         </div>
       </div>
 
-      {/* Dots Indicator */}
-
-      {/* CSS Animation */}
-      <style jsx>{`
-        @keyframes slide {
-          0%,
-          25% {
-            transform: translateX(0%);
-          }
-          33.33%,
-          58.33% {
-            transform: translateX(-100%);
-          }
-          66.66%,
-          91.66% {
-            transform: translateX(-200%);
-          }
-          100% {
-            transform: translateX(0%);
-          }
-        }
-
-        .animate-slide {
-          animation: slide 15s infinite ease-in-out;
-        }
-
-        /* Dot animations */
-        @keyframes dot1 {
-          0%,
-          33.33% {
-            background-color: #22c55e;
-          }
-          33.34%,
-          100% {
-            background-color: rgba(255, 255, 255, 0.6);
-          }
-        }
-
-        @keyframes dot2 {
-          0%,
-          33.33% {
-            background-color: rgba(255, 255, 255, 0.6);
-          }
-          33.34%,
-          66.66% {
-            background-color: #22c55e;
-          }
-          66.67%,
-          100% {
-            background-color: rgba(255, 255, 255, 0.6);
-          }
-        }
-
-        @keyframes dot3 {
-          0%,
-          66.66% {
-            background-color: rgba(255, 255, 255, 0.6);
-          }
-          66.67%,
-          100% {
-            background-color: #22c55e;
-          }
-        }
-
-        .animate-dot-1 {
-          animation: dot1 15s infinite;
-        }
-
-        .animate-dot-2 {
-          animation: dot2 15s infinite;
-        }
-
-        .animate-dot-3 {
-          animation: dot3 15s infinite;
-        }
-      `}</style>
+      {/* Dots Indicator (example) */}
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+        <span className="w-3 h-3 rounded-full animate-dot-1"></span>
+        <span className="w-3 h-3 rounded-full animate-dot-2"></span>
+        <span className="w-3 h-3 rounded-full animate-dot-3"></span>
+      </div>
     </section>
   );
 };

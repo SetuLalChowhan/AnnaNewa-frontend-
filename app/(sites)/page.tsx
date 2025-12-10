@@ -1,4 +1,4 @@
-"use client";
+import AsyncWrapper from "@/components/common/AsyncWrapper";
 import { Title36 } from "@/components/common/Title";
 import ArticleSection from "@/components/home/ArticleSection";
 import FooterCTA from "@/components/home/FooterCTA";
@@ -8,8 +8,6 @@ import ProductForBuy from "@/components/home/ProductForBuy";
 import ProductForSell from "@/components/home/ProductForSell";
 import Testimonial from "@/components/home/Testimonial";
 import WhyGoDirectSection from "@/components/home/WhyGoDirectSection";
-
-import React from "react";
 
 const page = () => {
   return (
@@ -21,9 +19,11 @@ const page = () => {
       <WhyGoDirectSection />
       <ArticleSection />
       <div className=" flex flex-col ">
-        <Title36 className="text-center text-gray-900 ">What Our Customers Say</Title36>
+        <Title36 className="text-center text-gray-900 ">
+          What Our Customers Say
+        </Title36>
         <Testimonial />
-        <FooterCTA/>
+        <FooterCTA />
       </div>
     </div>
   );

@@ -67,8 +67,8 @@ const ProductFilter = ({ closeFilter }: FilterProps) => {
 
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
-            <SelectItem value="seller">Seller Posts</SelectItem>
-            <SelectItem value="buyer">Buyer Posts</SelectItem>
+            <SelectItem value="sell">Seller Posts</SelectItem>
+            <SelectItem value="buy">Buyer Posts</SelectItem>
           </SelectContent>
         </Select>
       </div>

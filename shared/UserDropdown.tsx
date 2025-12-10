@@ -78,7 +78,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ className = "" }) => {
   }, []);
 
   const getUserInitial = () => user?.name.charAt(0).toUpperCase() ;
-  console.log(user?.profilePicture?.url);
+  
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>

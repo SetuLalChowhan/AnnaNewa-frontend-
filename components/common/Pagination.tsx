@@ -7,7 +7,7 @@ import { FaForward, FaBackward } from "react-icons/fa";
 interface PageProps {
   page: number;
   setPage: Function;
-  totalPage: number;
+  totalPage: Number;
 }
 
 const Pagination = ({ page, setPage, totalPage }: PageProps) => {
@@ -16,7 +16,7 @@ const Pagination = ({ page, setPage, totalPage }: PageProps) => {
       breakLabel="..."
       nextLabel={<FaForward />}
       previousLabel={<FaBackward />}
-      pageCount={totalPage}
+      pageCount={Number(totalPage)}
       pageRangeDisplayed={3}
       marginPagesDisplayed={2}
       onPageChange={(event) => setPage(event.selected + 1)}

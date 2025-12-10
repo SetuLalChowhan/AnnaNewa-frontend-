@@ -3,10 +3,28 @@
 import React, { useState } from "react";
 import ProductFilter from "./ProductFilter";
 import AllProducts from "./AllProducts";
+import useClient from "@/hooks/useClient";
+import { useValueStore } from "@/providers/useState";
 
-const AllProductSection = () => {
+const AllProductSection = ({ products }: { products: Array<any> }) => {
   const [showFilter, setShowFilter] = useState(false);
-  const [page,setPage] =useState(1);
+  const [page, setPage] = useState(1);
+  const { filterValue, setFilterValue } = useValueStore();
+  const { data, isLoading, isError } = useClient({
+    queryKey: ["products"],
+    url: "/product/all-products",
+    isPrivate: false,
+    params: {
+      search: filterValue.search,
+      category: filterValue.category,
+      sort: filterValue.sort,
+      postType: filterValue.postType,
+      page: page,
+    },
+    initialData: products,
+  });
+
+
 
   return (
     <div className="relative">
@@ -18,7 +36,15 @@ const AllProductSection = () => {
 
         {/* Products */}
         <div className="w-full md:w-[75%]">
-          <AllProducts openFilter={() => setShowFilter(true)} page={page} setPage={setPage} />
+          <AllProducts
+            openFilter={() => setShowFilter(true)}
+            page={page}
+            setPage={setPage}
+            products={data?.products}
+            pagination={data?.pagination}
+            isLoading={isLoading}
+            isError={isError}
+          />
         </div>
       </div>
 

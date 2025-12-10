@@ -166,26 +166,37 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@keyframes slide-continuous {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-@keyframes slideRight {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0%);
-  }
+@keyframes slide {
+  0%, 25% { transform: translateX(0%); }
+  33.33%, 58.33% { transform: translateX(-100%); }
+  66.66%, 91.66% { transform: translateX(-200%); }
+  100% { transform: translateX(0%); }
 }
 
-.animate-slideRight {
-  animation: slideRight 0.3s ease-out;
+.animate-slide {
+  animation: slide 15s infinite ease-in-out;
 }
+
+@keyframes dot1 {
+  0%, 33.33% { background-color: #22c55e; }
+  33.34%, 100% { background-color: rgba(255, 255, 255, 0.6); }
+}
+
+@keyframes dot2 {
+  0%, 33.33% { background-color: rgba(255, 255, 255, 0.6); }
+  33.34%, 66.66% { background-color: #22c55e; }
+  66.67%, 100% { background-color: rgba(255, 255, 255, 0.6); }
+}
+
+@keyframes dot3 {
+  0%, 66.66% { background-color: rgba(255, 255, 255, 0.6); }
+  66.67%, 100% { background-color: #22c55e; }
+}
+
+.animate-dot-1 { animation: dot1 15s infinite; }
+.animate-dot-2 { animation: dot2 15s infinite; }
+.animate-dot-3 { animation: dot3 15s infinite; }
+
 
 
 .animate-slide-continuous {

@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import ProductCard from "../card/ProductCard";
-import { dummyProducts } from "@/utils/Data";
 import {
   Select,
   SelectTrigger,
@@ -12,16 +11,56 @@ import {
 } from "@/components/ui/select";
 import { useValueStore } from "@/providers/useState";
 import Pagination from "../common/Pagination";
+import { Loader, AlertCircle } from "lucide-react";
+
+interface Pagination {
+  totalPages?: number;
+  page?: number;
+  limit?: number;
+}
 
 interface AllProductsProps {
   openFilter?: () => void;
   page: number;
   setPage: Function;
+  products: Array<any>;
+  pagination: Pagination;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
-const AllProducts = ({ openFilter, page, setPage }: AllProductsProps) => {
+const AllProducts = ({
+  openFilter,
+  page,
+  setPage,
+  products,
+  pagination,
+  isLoading,
+  isError,
+}: AllProductsProps) => {
   const { filterValue, setFilterValue } = useValueStore();
   const [sortType, setSortType] = useState(filterValue.sort || "latest");
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-10">
+        <Loader className="text-green-600 animate-spin" size={34} />
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="flex flex-col justify-center items-center py-10 text-center gap-3">
+        <AlertCircle size={34} className="text-red-600" />
+        <p className="text-red-600 font-medium">
+          Something went wrong while fetching products.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -52,6 +91,7 @@ const AllProducts = ({ openFilter, page, setPage }: AllProductsProps) => {
 
             <SelectContent>
               <SelectItem value="latest">Latest</SelectItem>
+              <SelectItem value="oldest">oldest</SelectItem>
               <SelectItem value="lowestPrice">Lowest Price</SelectItem>
               <SelectItem value="highestPrice">Highest Price</SelectItem>
             </SelectContent>
@@ -61,13 +101,18 @@ const AllProducts = ({ openFilter, page, setPage }: AllProductsProps) => {
 
       {/* Product Grid */}
       <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-        {dummyProducts.map((product) => (
+        {products?.map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}
       </div>
 
-      <div className=" flex w-full justify-center mt-10 items-center">
-        <Pagination page={page} setPage={setPage} totalPage={10} />
+      {/* Pagination */}
+      <div className="flex w-full justify-center mt-10 items-center">
+        <Pagination
+          page={page}
+          setPage={setPage}
+          totalPage={pagination.totalPages || 1}
+        />
       </div>
     </div>
   );

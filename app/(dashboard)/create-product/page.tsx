@@ -226,6 +226,7 @@ const ProductForm: FC = () => {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ProductFormData>({
     mode: "onChange",
@@ -283,6 +284,8 @@ const ProductForm: FC = () => {
     isPrivate: true,
     successMessage: "Product created!",
     invalidateKeys: [["products"]],
+    resetFunction: reset,
+    setImages :setImages
   });
 
   const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
@@ -322,6 +325,7 @@ const ProductForm: FC = () => {
         data: formData,
         config: { headers: { "Content-Type": "multipart/form-data" } },
       });
+      
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "An error occurred";
