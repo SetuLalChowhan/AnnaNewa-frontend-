@@ -22,7 +22,7 @@ import { Testimonial } from "@/types/Testimonial";
 import { FaSeedling, FaHandshake, FaTruck } from "react-icons/fa";
 import { FaMoneyBillWave, FaShoppingCart } from "react-icons/fa";
 import { ProductDetails } from "@/types/ProductDetails";
-export const dummyProducts: Product[] = [
+export const dummyProducts: any = [
   {
     _id: "1",
     title: "Fresh Korola",
