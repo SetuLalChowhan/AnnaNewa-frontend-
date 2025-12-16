@@ -47,7 +47,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {pricePerKg} BDT / kg | {totalWeight} kg
         </TitleBase>
         <span className="inline-flex bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-          {category}
+          {category?.name}
         </span>
       </div>
       <div className="w-full p-4 inline-flex">

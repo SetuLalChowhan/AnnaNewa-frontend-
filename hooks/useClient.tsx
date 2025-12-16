@@ -28,7 +28,7 @@ const useClient = ({
       const res = await client.get(url, { params });
       return res.data; // keep .data here because axios returns { data, status, ... }
     },
-    placeholderData: initialData,
+
     enabled,
     staleTime: 5 * 60 * 1000,
     retry: 1,
@@ -40,6 +40,7 @@ const useClient = ({
     isFetching: query.isFetching,
     isError: query.isError,
     error: query.error,
+
     refetch: query.refetch,
   };
 };

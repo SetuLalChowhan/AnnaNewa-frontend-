@@ -6,7 +6,7 @@ import AllProducts from "./AllProducts";
 import useClient from "@/hooks/useClient";
 import { useValueStore } from "@/providers/useState";
 
-const AllProductSection = ({ products }: { products: Array<any> }) => {
+const AllProductSection = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
   const { filterValue, setFilterValue } = useValueStore();
@@ -16,15 +16,12 @@ const AllProductSection = ({ products }: { products: Array<any> }) => {
     isPrivate: false,
     params: {
       search: filterValue.search,
-      category: filterValue.category,
+      category: filterValue.category_id,
       sort: filterValue.sort,
       postType: filterValue.postType,
       page: page,
     },
-    initialData: products,
   });
-
-
 
   return (
     <div className="relative">

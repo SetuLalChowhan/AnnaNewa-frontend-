@@ -1,15 +1,26 @@
 import { fetchData } from "@/api/api";
-import AllProductSection from "@/components/products/AllProductSection";
 import ProductBanner from "@/components/products/ProductBanner";
-import React from "react";
+import AllProductSection from "@/components/products/AllProductSection";
+import { QueryClient, dehydrate } from "@tanstack/react-query";
+import { HydrationBoundary } from "@tanstack/react-query";
 
 const page = async () => {
-  const products = await fetchData("product/all-products");
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["products"],
+    queryFn: () => fetchData("product/all-products"),
+  });
+
+  console.log(queryClient)
 
   return (
     <div>
       <ProductBanner />
-      <AllProductSection products={products} />
+
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <AllProductSection />
+      </HydrationBoundary>
     </div>
   );
 };

@@ -9,30 +9,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useValueStore } from "@/providers/useState";
+import useClient from "@/hooks/useClient";
 
 interface FilterProps {
   closeFilter?: () => void;
 }
 
-const categories: string[] = [
-  "Vegetable",
-  "Rice",
-  "Fruit",
-  "Fish",
-  "Meat",
-  "Dairy",
-  "Spice",
-  "Others",
-];
-
 const ProductFilter = ({ closeFilter }: FilterProps) => {
   const { filterValue, setFilterValue } = useValueStore();
 
   // Single category toggle
-  const handleCategoryChange = (cat: string) => {
-    const newCategory = filterValue.category === cat ? "" : cat;
-    setFilterValue({ category: newCategory });
+  const handleCategoryChange = (cat: any) => {
+    const newCategory = filterValue.category_id === cat._id ? "" : cat._id;
+    setFilterValue({ category_id: newCategory });
   };
+  const categories = useClient({
+    queryKey: ["categories"],
+    url: "/categories",
+    isPrivate: false,
+  });
 
   // Post type change
   const handlePostTypeChange = (value: string) => {
@@ -77,15 +72,18 @@ const ProductFilter = ({ closeFilter }: FilterProps) => {
       <div className="mb-6">
         <label className="text-sm font-medium">Categories</label>
         <div className="mt-3 flex flex-col gap-3">
-          {categories.map((cat) => (
-            <label key={cat} className="flex items-center gap-3 cursor-pointer">
+          {categories?.data?.categories?.map((cat: any, index: number) => (
+            <label
+              key={index}
+              className="flex items-center gap-3 cursor-pointer"
+            >
               <input
                 type="checkbox"
                 className="w-4 h-4 accent-primaryColor"
-                checked={filterValue.category === cat}
+                checked={filterValue.category_id == cat?._id}
                 onChange={() => handleCategoryChange(cat)}
               />
-              <span className="text-sm">{cat}</span>
+              <span className="text-sm">{cat.name}</span>
             </label>
           ))}
         </div>

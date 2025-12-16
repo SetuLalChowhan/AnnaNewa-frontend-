@@ -2,17 +2,16 @@ import { create } from "zustand";
 
 interface FilterValue {
   search: string;
-  category: string;
+  category_id: string;
   sort: string;
   postType: string;
   page: number;
-  
 }
 
 interface ValueStore {
   email: string;
   resetToken: string;
-  apiError:string;
+  apiError: string;
   filterValue: FilterValue;
   setEmail: (value: string) => void;
   setResetToken: (value: string) => void;
@@ -23,13 +22,13 @@ interface ValueStore {
 export const useValueStore = create<ValueStore>((set) => ({
   email: "",
   resetToken: "",
-  apiError:"",
+  apiError: "",
   filterValue: {
     search: "",
-    category: "",
+    category_id: "",
     sort: "",
     postType: "",
-    page:1
+    page: 1,
   },
 
   setEmail: (value) => set({ email: value }),

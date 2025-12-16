@@ -27,6 +27,7 @@ interface AllProductsProps {
   pagination: Pagination;
   isLoading?: boolean;
   isError?: boolean;
+  isPlaceholderData?: boolean;
 }
 
 const AllProducts = ({
@@ -37,12 +38,14 @@ const AllProducts = ({
   pagination,
   isLoading,
   isError,
+
 }: AllProductsProps) => {
   const { filterValue, setFilterValue } = useValueStore();
   const [sortType, setSortType] = useState(filterValue.sort || "latest");
+  const length = products?.length;
 
   // Loading state
-  if (isLoading) {
+  if (isLoading ) {
     return (
       <div className="flex justify-center items-center py-10">
         <Loader className="text-green-600 animate-spin" size={34} />
@@ -100,11 +103,17 @@ const AllProducts = ({
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-        {products?.map((product) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
-      </div>
+      {length === 0 ? (
+        <div className="text-center mt-10">
+          <p className="text-gray-500">No products available</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+          {products.map((product : any) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="flex w-full justify-center mt-10 items-center">

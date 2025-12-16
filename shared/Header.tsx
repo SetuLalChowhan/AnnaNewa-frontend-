@@ -72,7 +72,7 @@ const Header = () => {
         </Link>
 
         {/* Products Dropdown */}
-        <div
+        {/* <div
           className="relative"
           onMouseEnter={() => setProductOpen(true)}
           onMouseLeave={() => setProductOpen(false)}
@@ -124,7 +124,16 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </div> */}
+
+          <Link
+          href="/products"
+          className={`hover:text-primaryColor transition ${
+            isActive("/products") ? "text-primaryColor font-semibold" : ""
+          }`}
+        >
+          Products
+        </Link>
 
         <Link
           href="/articles"

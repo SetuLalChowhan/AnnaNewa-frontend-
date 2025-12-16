@@ -9,7 +9,9 @@ export interface Product {
   description: string;
   pricePerKg: number;
   totalWeight: number;
-  images: ProductImage []; // <-- allow both
-  category: string;
+  images: ProductImage[]; // <-- allow both
+  category: {
+    name: string;
+  };
   slug: string;
 }
