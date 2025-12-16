@@ -6,7 +6,7 @@ import AllProducts from "./AllProducts";
 import useClient from "@/hooks/useClient";
 import { useValueStore } from "@/providers/useState";
 
-const AllProductSection = () => {
+const AllProductSection = ({ products }: any) => {
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
   const { filterValue, setFilterValue } = useValueStore();
@@ -21,7 +21,10 @@ const AllProductSection = () => {
       postType: filterValue.postType,
       page: page,
     },
+    initialData: products,
   });
+
+  console.log(products);
 
   return (
     <div className="relative">
