@@ -28,9 +28,9 @@ const useClient = ({
       const res = await client.get(url, { params });
       return res.data; // keep .data here because axios returns { data, status, ... }
     },
-    initialData: initialData,
+    // initialData: initialData,
     enabled,
-    staleTime: 5 * 60 * 1000,
+    // staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 

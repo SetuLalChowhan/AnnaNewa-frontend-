@@ -21,7 +21,6 @@ const AllProductSection = ({ products }: any) => {
       postType: filterValue.postType,
       page: page,
     },
-    initialData: products,
   });
 
   console.log(products);
