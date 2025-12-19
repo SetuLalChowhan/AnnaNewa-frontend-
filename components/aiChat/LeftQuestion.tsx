@@ -1,44 +1,84 @@
+// components/aiChat/LeftQuestion.tsx
 import React, { useState } from "react";
+import { 
+  LuShoppingBag, 
+  LuGavel, 
+  LuListChecks, 
+  LuNewspaper,
+  LuMessageSquare
+} from "react-icons/lu";
 
 interface LeftQuestionProps {
   setSelectedQuestion: (q: string) => void;
 }
 
 const questions = [
-  "Post a product as a seller",
-  "Bid on a product as a buyer",
-  "Check my bids",
-  "Read farming articles",
+  { 
+    text: "Post a product as a seller", 
+    icon: <LuShoppingBag size={20} /> 
+  },
+  { 
+    text: "Bid on a product as a buyer", 
+    icon: <LuGavel size={20} /> 
+  },
+  { 
+    text: "Check my bids", 
+    icon: <LuListChecks size={20} /> 
+  },
+  { 
+    text: "Read farming articles", 
+    icon: <LuNewspaper size={20} /> 
+  },
 ];
 
 const LeftQuestion: React.FC<LeftQuestionProps> = ({ setSelectedQuestion }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   return (
-    <div className="w-full md:w-1/4 bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-lg flex flex-col gap-4">
-      <h2 className="text-xl font-semibold text-gray-700 dark:text-[#d2e5f5] mb-4">
-        Actions
-      </h2>
-      <div className="flex flex-col gap-3">
+    <div className="h-full bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg flex flex-col">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="p-2 bg-primaryColor/10 rounded-lg">
+          <LuMessageSquare size={24} className="text-primaryColor" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-[#d2e5f5]">
+            Quick Actions
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Click to ask about
+          </p>
+        </div>
+      </div>
+      
+      <div className="flex-1 flex flex-col gap-3">
         {questions.map((q, idx) => (
           <button
             key={idx}
             onClick={() => {
-              setSelectedQuestion(q);
+              setSelectedQuestion(q.text);
               setActiveIndex(idx);
             }}
             className={`
-              text-left px-4 py-3 rounded-xl transition-all duration-200 font-medium
-              ${
-                activeIndex === idx
-                  ? "bg-primaryColor text-white shadow-md"
-                  : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-[#d2e5f5] hover:bg-primaryColor/20 "
+              flex items-center gap-4 text-left px-5 py-4 rounded-xl 
+              transition-all duration-200 font-medium
+              ${activeIndex === idx
+                ? "bg-gradient-to-r from-primaryColor to-blue-500 text-white shadow-lg transform scale-[1.02]"
+                : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-[#d2e5f5] hover:bg-gray-200 dark:hover:bg-slate-700"
               }
             `}
           >
-            {q}
+            <div className={`${activeIndex === idx ? "text-white" : "text-primaryColor"}`}>
+              {q.icon}
+            </div>
+            <span className="flex-1">{q.text}</span>
           </button>
         ))}
+      </div>
+
+      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-slate-800">
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+          Select an action to ask the AI assistant
+        </p>
       </div>
     </div>
   );

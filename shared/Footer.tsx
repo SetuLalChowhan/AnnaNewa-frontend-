@@ -1,5 +1,11 @@
+"use client"
+
 import Link from "next/link";
-import React from "react";
+import { usePathname } from "next/navigation";
+
+
+
+
 
 const Footer = () => {
   const linkSections = [
@@ -34,8 +40,14 @@ const Footer = () => {
     },
   ];
 
+  const pathname = usePathname();
+
+  const hideFooter = pathname === "/ai-chat";
+
+
+
   return (
-    <div className="px-6 md:px-16 lg:px-24 xl:px-32 bg-white">
+    <div hidden={hideFooter} className="px-6 md:px-16 lg:px-24 xl:px-32 bg-white">
       <div className="flex flex-col md:flex-row items-start justify-between gap-10 py-10 border-b border-gray-300/40 text-gray-600">
         {/* Logo + Description */}
         <div>

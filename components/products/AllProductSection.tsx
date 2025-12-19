@@ -23,8 +23,6 @@ const AllProductSection = ({ products }: any) => {
     },
   });
 
-  console.log(products);
-
   return (
     <div className="relative">
       <div className="section-padding-x section-padding-y flex w-full gap-10">

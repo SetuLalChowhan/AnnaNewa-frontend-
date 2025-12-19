@@ -38,20 +38,12 @@ const AllProducts = ({
   pagination,
   isLoading,
   isError,
-
 }: AllProductsProps) => {
   const { filterValue, setFilterValue } = useValueStore();
   const [sortType, setSortType] = useState(filterValue.sort || "latest");
   const length = products?.length;
 
   // Loading state
-  if (isLoading ) {
-    return (
-      <div className="flex justify-center items-center py-10">
-        <Loader className="text-green-600 animate-spin" size={34} />
-      </div>
-    );
-  }
 
   // Error state
   if (isError) {
@@ -103,13 +95,17 @@ const AllProducts = ({
       </div>
 
       {/* Product Grid */}
-      {length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center items-center py-10">
+          <Loader className="text-green-600 animate-spin" size={34} />
+        </div>
+      ) : length === 0 ? (
         <div className="text-center mt-10">
           <p className="text-gray-500">No products available</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
-          {products.map((product : any) => (
+          {products?.map((product: any) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
@@ -120,7 +116,7 @@ const AllProducts = ({
         <Pagination
           page={page}
           setPage={setPage}
-          totalPage={pagination.totalPages || 1}
+          totalPage={pagination?.totalPages || 1}
         />
       </div>
     </div>
