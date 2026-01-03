@@ -1,423 +1,380 @@
-// components/aiChat/RightSideChat.tsx
-import React, { useState, useEffect, useRef, KeyboardEvent } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
-import { LuSend, LuLoader, LuBot, LuUser } from "react-icons/lu";
-import useClient from "@/hooks/useClient";
-import useMutationClient from "@/hooks/useMutationClient";
-import axios from "axios";
+"use client";
+
+import React, { useState, useEffect, useRef, useCallback, memo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { LuSend, LuLoader, LuBot, LuUser, LuCopy, LuCheck } from "react-icons/lu";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import useClient from "@/hooks/useClient";
 
-interface RightSideChatProps {
-  selectedQuestion: string | null;
-}
+// --- Components for Markdown Rendering ---
 
-interface Message {
-  id: number;
-  text: string;
-  sender: "user" | "ai";
-  timestamp?: Date;
-  isLoading?: boolean;
-}
+const CopyButton = ({ text }: { text: string }) => {
+  const [copied, setCopied] = useState(false);
 
-interface ChatHistory {
-  _id: string;
-  userId: string;
-  userMessage: string;
-  aiReply: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
-interface ChatHistoryResponse {
-  success: boolean;
-  chats: ChatHistory[];
-}
+  return (
+    <button
+      onClick={handleCopy}
+      className="p-1.5 hover:bg-white/10 rounded-md transition-colors text-gray-400 hover:text-white"
+      title="Copy code"
+    >
+      {copied ? <LuCheck size={14} className="text-green-400" /> : <LuCopy size={14} />}
+    </button>
+  );
+};
 
-const RightSideChat: React.FC<RightSideChatProps> = ({ selectedQuestion }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [chatStarted, setChatStarted] = useState(false);
+const CodeBlock = ({ inline, className, children, ...props }: any) => {
+  const match = /language-(\w+)/.exec(className || "");
+  const language = match ? match[1] : "";
+  const codeString = String(children).replace(/\n$/, "");
+
+  if (!inline && match) {
+    return (
+      <div className="relative my-4 rounded-lg overflow-hidden border border-gray-700/50 shadow-sm bg-[#1e1e1e]">
+        <div className="flex items-center justify-between px-3 py-2 bg-[#2d2d2d] border-b border-gray-700/50">
+          <span className="text-xs text-gray-400 font-mono lower">{language}</span>
+          <CopyButton text={codeString} />
+        </div>
+        <SyntaxHighlighter
+          style={vscDarkPlus}
+          language={language}
+          PreTag="div"
+          className="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto custom-scrollbar"
+          showLineNumbers={true}
+          wrapLines={true} // Ensure long lines wrap
+          {...props}
+        >
+          {codeString}
+        </SyntaxHighlighter>
+      </div>
+    );
+  }
+
+  return (
+    <code
+      className={`${className} bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-pink-600 dark:text-pink-400`}
+      {...props}
+    >
+      {children}
+    </code>
+  );
+};
+
+const MarkdownComponents = {
+  // Use our custom CodeBlock component
+  code: CodeBlock,
+  // Custom Table Components
+  table: ({ children }: any) => (
+    <div className="overflow-x-auto my-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+      <table className="w-full text-left text-sm border-collapse">{children}</table>
+    </div>
+  ),
+  thead: ({ children }: any) => (
+    <thead className="bg-gray-100 dark:bg-slate-800 border-b border-gray-200 dark:border-gray-700">
+      {children}
+    </thead>
+  ),
+  tr: ({ children }: any) => <tr className="border-b border-gray-100 dark:border-gray-700 last:border-0">{children}</tr>,
+  th: ({ children }: any) => (
+    <th className="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{children}</th>
+  ),
+  td: ({ children }: any) => <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{children}</td>,
+  // Links
+  a: ({ href, children }: any) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 hover:underline">
+      {children}
+    </a>
+  ),
+  // Lists
+  ul: ({ children }: any) => <ul className="list-disc pl-5 my-2 space-y-1">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal pl-5 my-2 space-y-1">{children}</ol>,
+  li: ({ children }: any) => <li className="pl-1">{children}</li>,
+  // Headings
+  h1: ({ children }: any) => <h1 className="text-2xl font-bold mb-4 mt-6 pb-2 border-b dark:border-slate-700">{children}</h1>,
+  h2: ({ children }: any) => <h2 className="text-xl font-bold mb-3 mt-5 pb-1 border-b dark:border-slate-700/50">{children}</h2>,
+  h3: ({ children }: any) => <h3 className="text-lg font-bold mb-2 mt-4">{children}</h3>,
+  // Paragraph
+  p: ({ children }: any) => <p className="leading-7 mb-3 last:mb-0">{children}</p>,
+  // Blockquote
+  blockquote: ({ children }: any) => (
+    <blockquote className="border-l-4 border-blue-500 pl-4 py-1 my-4 bg-gray-50 dark:bg-slate-800/50 italic text-gray-600 dark:text-gray-300 rounded-r">
+      {children}
+    </blockquote>
+  ),
+};
+
+const ChatMessage = memo(({ message }: { message: any }) => {
+  const isUser = message.role === "user";
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}
+    >
+      <div className={`flex gap-3 max-w-[90%] md:max-w-[85%] ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+        {/* Avatar */}
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+            isUser ? "bg-primaryColor" : "bg-blue-600"
+          } text-white shadow-sm mt-1`}
+        >
+          {isUser ? <LuUser size={14} /> : <LuBot size={14} />}
+        </div>
+
+        {/* Bubble */}
+        <div
+          className={`p-4 rounded-2xl shadow-sm text-sm ${
+            isUser
+              ? "bg-primaryColor text-white rounded-tr-sm"
+              : "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-sm border border-gray-100 dark:border-slate-700"
+          }`}
+        >
+          {message.isLoading ? (
+            <div className="flex items-center gap-2 text-gray-500 py-1 px-1">
+               <LuLoader className="animate-spin" size={16} />
+               <span className="text-xs">Thinking...</span>
+            </div>
+          ) : (
+            <div className={`markdown-body ${isUser ? "text-white" : "dark:text-slate-100"}`}>
+               {/* 
+                  If it's a user message, we might not want full markdown rendering 
+                  for safety/simplicity, or we can allow it. 
+                  Usually user messages are plain text, but rendering basic MD is fine.
+                  We'll apply specific overrides for user messages if needed (e.g., keeping white text).
+               */}
+               {isUser ? (
+                 <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+               ) : (
+                 <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
+                   <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]} 
+                      components={MarkdownComponents}
+                   >
+                      {message.content}
+                   </ReactMarkdown>
+                 </div>
+               )}
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+});
+
+ChatMessage.displayName = "ChatMessage";
+
+const RightSideChat = ({ selectedQuestion }: { selectedQuestion: string | null }) => {
+  const [messages, setMessages] = useState<any[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Fetch chat history
-  const { data: chatHistoryData, isLoading: isHistoryLoading } = useClient({
+  // 1. Fetch History using your custom hook
+  const { data: history } = useClient({
     queryKey: ["chatHistory"],
     url: "/ai/chat/history",
     isPrivate: true,
   });
 
-  // Stream chat mutation - using your existing hook for non-streaming fallback
-  const streamMutation = useMutationClient({
-    url: "/ai/chat/stream",
-    method: "post",
-    isPrivate: true,
-    successMessage: "",
-    invalidateKeys: [["chatHistory"]],
-  });
-
-  // Scroll to bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Sync history once data arrives
   useEffect(() => {
-    scrollToBottom();
+    if (history?.chats) {
+      const formatted = history.chats.flatMap((c: any) => [
+        { role: "user", content: c.userMessage },
+        { role: "assistant", content: c.aiReply }
+      ]);
+      setMessages(formatted);
+    }
+  }, [history]);
+
+  // 2. Auto-scroll logic
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Load chat history on component mount
-  useEffect(() => {
-    if (chatHistoryData?.chats && chatHistoryData.chats.length > 0) {
-      const historyMessages: Message[] = [];
-      
-      chatHistoryData.chats.forEach((chat :any, index :any) => {
-        // Add user message
-        historyMessages.push({
-          id: index * 2 + 1,
-          text: chat.userMessage,
-          sender: "user",
-          timestamp: new Date(chat.createdAt),
-        });
-        
-        // Add AI reply
-        historyMessages.push({
-          id: index * 2 + 2,
-          text: chat.aiReply,
-          sender: "ai",
-          timestamp: new Date(chat.createdAt),
-        });
-      });
-      
-      setMessages(historyMessages);
-      if (!chatStarted) {
-        setChatStarted(true);
-      }
-    }
-  }, [chatHistoryData]);
+  // 3. Optimized Streaming Handler
+  const handleSendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || isStreaming) return;
 
-  // Add selected question from LeftQuestion
-  useEffect(() => {
-    if (selectedQuestion && chatStarted) {
-      handleSendMessage(selectedQuestion);
-    }
-  }, [selectedQuestion, chatStarted]);
-
-  // Function to send message with streaming
-  const handleSendMessage = async (messageText?: string) => {
-    const text = messageText || newMessage.trim();
-    if (!text) return;
-
-    // Create user message
-    const userMessageId = Date.now();
-    const aiMessageId = userMessageId + 1;
-
-    // Add user message
-    setMessages(prev => [...prev, {
-      id: userMessageId,
-      text: text,
-      sender: "user",
-      timestamp: new Date(),
-    }]);
-
-    // Add loading AI message
-    setMessages(prev => [...prev, {
-      id: aiMessageId,
-      text: "",
-      sender: "ai",
-      timestamp: new Date(),
-      isLoading: true,
-    }]);
-
-    // Clear input if using input field
-    if (!messageText) {
-      setNewMessage("");
-    }
-
+    // Add user message & empty assistant placeholder
+    setMessages(prev => [...prev, { role: "user", content: text }, { role: "assistant", content: "", isLoading: true }]);
     setIsStreaming(true);
 
+    abortControllerRef.current = new AbortController();
+    
     try {
-      // Cancel any existing stream
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      // Create new AbortController for this stream
-      abortControllerRef.current = new AbortController();
-
-      // Stream the AI response
-      await streamAIResponse(text, aiMessageId);
-
-    } catch (error) {
-      if (axios.isCancel(error)) {
-        console.log('Request canceled:', error.message);
-      } else {
-        console.error('Stream error:', error);
-        // Update AI message with error
-        setMessages(prev => prev.map(msg => 
-          msg.id === aiMessageId 
-            ? { ...msg, text: "Sorry, I encountered an error. Please try again.", isLoading: false }
-            : msg
-        ));
-      }
-    } finally {
-      setIsStreaming(false);
-      if (!messageText) {
-        inputRef.current?.focus();
-      }
-    }
-  };
-
-  // Stream AI response
-  const streamAIResponse = async (userMessage: string, aiMessageId: number) => {
-    try {
-      const response = await fetch('http://localhost:4000/api/ai/chat/stream', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: userMessage }),
-          credentials: 'include',
-          
+      const response = await fetch("http://localhost:4000/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+        signal: abortControllerRef.current.signal,
+        credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error("Network response was not ok");
       }
 
+      // Check if the response is JSON (not a stream)
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        const reply = data.reply || data.message || JSON.stringify(data); // Fallback for various formats
+        
+        setMessages(prev => {
+          const updated = [...prev];
+          const lastIdx = updated.length - 1;
+          updated[lastIdx] = { ...updated[lastIdx], content: reply, isLoading: false };
+          return updated;
+        });
+        return; // Exit early since we handled the JSON response
+      }
+
+      // Standard Streaming Logic (SSE)
       const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('No reader available');
-      }
-
       const decoder = new TextDecoder();
-      let aiResponse = '';
+      let streamContent = "";
 
-      while (true) {
+      while (reader) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n\n');
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n\n");
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') {
-              // Stream complete
-              setMessages(prev => prev.map(msg => 
-                msg.id === aiMessageId 
-                  ? { ...msg, isLoading: false }
-                  : msg
-              ));
-              return;
-            }
-
-            aiResponse += data;
-            // Update AI message with new content
-            setMessages(prev => prev.map(msg => 
-              msg.id === aiMessageId 
-                ? { ...msg, text: aiResponse, isLoading: false }
-                : msg
-            ));
-          }
+          if (!line.startsWith("data: ")) continue;
+          const data = line.replace("data: ", "");
+          
+          if (data === "[DONE]") break;
+          
+          streamContent += data;
+          // Functional update to avoid stale state
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastIdx = updated.length - 1;
+            updated[lastIdx] = { ...updated[lastIdx], content: streamContent, isLoading: false };
+            return updated;
+          });
         }
       }
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Stream aborted');
-      } else {
-        throw error;
+    } catch (err: any) {
+      if (err.name !== "AbortError") {
+        console.error("Chat Error:", err);
+        setMessages(prev => {
+          const updated = [...prev];
+          if (updated.length > 0 && updated[updated.length - 1].isLoading) {
+             updated[updated.length - 1] = { ...updated[updated.length - 1], content: "Error: " + (err.message || "Failed to connect"), isLoading: false };
+          }
+          return updated; 
+        });
       }
-    }
-  };
-
-  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !isStreaming) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const handleStartChat = () => {
-    setChatStarted(true);
-    
-    // If there's no history, show welcome message
-    if (messages.length === 0) {
-      setMessages([{
-        id: 1,
-        text: "Hello! I'm here to help you with Annanewa. You can ask me about posting products, bidding, checking your bids, or farming articles. How can I assist you today?",
-        sender: "ai",
-        timestamp: new Date(),
-      }]);
-    }
-  };
-
-  const handleStopStream = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
+    } finally {
       setIsStreaming(false);
     }
-  };
+  }, [isStreaming]);
 
-  const messageVariants: Variants = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { type: "spring", damping: 18, stiffness: 200 },
-    },
-  };
+  // 4. Prevent infinite loop on selectedQuestion
+  const prevQuestionRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (selectedQuestion && selectedQuestion !== prevQuestionRef.current) {
+      prevQuestionRef.current = selectedQuestion;
+      handleSendMessage(selectedQuestion);
+    }
+  }, [selectedQuestion, handleSendMessage]);
 
   return (
-    <div className="flex flex-col flex-1 h-full bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
-      {/* Chat Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-700 dark:text-[#d2e5f5]">
-            AI Assistant
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Ask me anything about Annanewa
-          </p>
-        </div>
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm border dark:border-slate-800">
+      <div className="p-4 border-b dark:border-slate-800 flex justify-between items-center bg-white/50 dark:bg-slate-900/50 backdrop-blur z-10">
+        <h2 className="font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100"><LuBot className="text-primaryColor" /> AI Assistant</h2>
         {isStreaming && (
-          <button
-            onClick={handleStopStream}
-            className="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-          >
-            Stop
-          </button>
+          <button onClick={() => abortControllerRef.current?.abort()} className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-full hover:bg-red-100 transition-colors font-medium border border-red-200">Stop Generating</button>
         )}
       </div>
 
-      {/* Chat messages */}
-      <div className="flex-1 p-4 overflow-y-auto">
-        {chatStarted ? (
-          <AnimatePresence>
-            {messages.map((msg) => (
-              <motion.div
-                key={msg.id}
-                initial="hidden"
-                animate="visible"
-                variants={messageVariants}
-                className={`mb-4 flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[80%] flex ${msg.sender === "user" ? "flex-row-reverse" : "flex-row"} items-start gap-3`}
-                >
-                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                    msg.sender === "user" 
-                      ? "bg-primaryColor text-white" 
-                      : "bg-blue-500 text-white"
-                  }`}>
-                    {msg.sender === "user" ? <LuUser size={16} /> : <LuBot size={16} />}
-                  </div>
-                  <div className={`px-4 py-3 rounded-2xl ${msg.sender === "user"
-                      ? "bg-primaryColor text-white rounded-tr-none"
-                      : "bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-[#d2e5f5] rounded-tl-none"
-                    }`}
-                  >
-                    {msg.isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <LuLoader className="animate-spin" size={16} />
-                        <span>Thinking...</span>
-                      </div>
-                    ) : (
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <ReactMarkdown>{msg.text}</ReactMarkdown>
-                      </div>
-                    )}
-                    <div className="text-xs opacity-70 mt-2">
-                      {msg.timestamp?.toLocaleTimeString([], { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-            <div ref={messagesEndRef} />
-          </AnimatePresence>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-4">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primaryColor to-blue-500 flex items-center justify-center mb-6">
-              <LuBot size={40} className="text-white" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">
-              Welcome to Annanewa Chat!
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-md">
-              I'm your AI assistant here to help you with farming-related questions, 
-              product listings, bidding, and more.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 max-w-lg">
-              {[
-                "How do I list a product?",
-                "What's the bidding process?",
-                "How to check my bids?",
-                "Tell me about organic farming"
-              ].map((suggestion, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setChatStarted(true);
-                    handleSendMessage(suggestion);
-                  }}
-                  className="px-4 py-3 text-left bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors text-gray-700 dark:text-gray-200"
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={handleStartChat}
-              className="px-8 py-3 bg-gradient-to-r from-primaryColor to-blue-500 text-white rounded-full font-semibold hover:shadow-lg transition-all hover:scale-105"
-            >
-              Start New Chat
-            </button>
-          </div>
-        )}
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth">
+        {messages.length === 0 && <WelcomeHero />}
+        <AnimatePresence mode="popLayout" initial={false}>
+          {messages.map((m, i) => (
+            <ChatMessage key={i} message={m} />
+          ))}
+        </AnimatePresence>
+        <div ref={scrollRef} className="h-4" />
       </div>
 
-      {/* Message input */}
-      {chatStarted && (
-        <div className="p-4 bg-gray-50 dark:bg-[#020617] border-t border-gray-200 dark:border-slate-700">
-          <div className="flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              disabled={isStreaming}
-              className="flex-1 px-4 py-3 rounded-full border dark:bg-slate-900 dark:border-slate-700 dark:text-[#d2e5f5] focus:outline-none focus:ring-2 focus:ring-primaryColor disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSendMessage()}
-              disabled={!newMessage.trim() || isStreaming}
-              className="bg-primaryColor text-white p-3 rounded-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primaryColor/90 transition-colors"
-            >
-              {isStreaming ? (
-                <LuLoader className="animate-spin" size={20} />
-              ) : (
-                <LuSend size={20} />
-              )}
-            </motion.button>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-            Press Enter to send • AI may produce inaccurate information
-          </p>
-        </div>
-      )}
+      <ChatInput onSend={handleSendMessage} disabled={isStreaming} />
     </div>
   );
 };
+
+const ChatInput = ({ onSend, disabled }: any) => {
+  const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || disabled) return;
+    onSend(input);
+    setInput("");
+    // Reset height if we were using auto-resize (optional enhancement)
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
+  return (
+    <form className="p-4 bg-white dark:bg-slate-900 border-t dark:border-slate-800 flex gap-2 items-end" onSubmit={handleSubmit}>
+      <div className="flex-1 relative">
+          <textarea
+            ref={inputRef}
+            rows={1}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type a message..."
+            className="w-full bg-gray-50 dark:bg-slate-800 border-0 text-slate-900 dark:text-slate-100 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-primaryColor/50 outline-none resize-none min-h-[44px] max-h-[120px] scrollbar-hide"
+            disabled={disabled}
+            style={{ height: "auto" }} // Simplification, normally we'd calc height
+          />
+      </div>
+      <button 
+        type="submit" 
+        disabled={!input.trim() || disabled} 
+        className="p-3 bg-primaryColor hover:bg-primaryColor/90 text-white rounded-xl disabled:opacity-50 disabled:hover:bg-primaryColor transition-all shadow-sm"
+      >
+        <LuSend size={18} />
+      </button>
+    </form>
+  );
+};
+
+const WelcomeHero = () => (
+  <div className="flex flex-col items-center justify-center h-full opacity-60 pointer-events-none select-none">
+    <div className="w-16 h-16 bg-blue-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+        <LuBot size={32} className="text-primaryColor" />
+    </div>
+    <p className="text-lg font-medium text-slate-700 dark:text-slate-300">How can I help you today?</p>
+    <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Ask me anything about your data or code.</p>
+  </div>
+);
 
 export default RightSideChat;

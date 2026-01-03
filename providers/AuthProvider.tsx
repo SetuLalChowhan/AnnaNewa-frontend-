@@ -33,18 +33,17 @@ export const AuthProvider = ({
     isLoading,
     isFetching,
   } = useQuery<User>({
-  queryKey: ["userProfile"],
-  queryFn: async () => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
-      { withCredentials: true }
-    );
-    setUser(res.data.user);
-    return res.data.user;
-  },
-  initialData : initialData || undefined,
-  
-});
+    queryKey: ["userProfile"],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
+        { withCredentials: true }
+      );
+      setUser(res.data.user);
+      return res.data.user;
+    },
+    initialData: initialData || undefined,
+  });
 
   const logout = async () => {
     try {

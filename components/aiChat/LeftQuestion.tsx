@@ -14,19 +14,19 @@ interface LeftQuestionProps {
 
 const questions = [
   { 
-    text: "Post a product as a seller", 
-    icon: <LuShoppingBag size={20} /> 
-  },
-  { 
-    text: "Bid on a product as a buyer", 
+    text: "How do I participate in a bid as a buyer?", 
     icon: <LuGavel size={20} /> 
   },
   { 
-    text: "Check my bids", 
+    text: "How can I post my harvest for sale?", 
+    icon: <LuShoppingBag size={20} /> 
+  },
+  { 
+    text: "Explain the product delivery process", 
     icon: <LuListChecks size={20} /> 
   },
   { 
-    text: "Read farming articles", 
+    text: "Check latest farming technique articles", 
     icon: <LuNewspaper size={20} /> 
   },
 ];
