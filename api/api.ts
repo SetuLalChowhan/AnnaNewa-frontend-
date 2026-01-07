@@ -27,11 +27,11 @@ export const fetchData = async (endpoint: string): Promise<any> => {
 
     if (!res.ok) {
       const errorData = await res.text();
-      throw new APIError(
-        res.status,
-        res.statusText,
-        `API Error ${res.status}: ${res.statusText} - ${errorData || "Unknown error"}`
-      );
+      // throw new APIError(
+      //   res.status,
+      //   res.statusText,
+      //   `API Error ${res.status}: ${res.statusText} - ${errorData || "Unknown error"}`
+      // );
     }
 
     const data = await res.json();
@@ -42,9 +42,9 @@ export const fetchData = async (endpoint: string): Promise<any> => {
       throw err;
     }
 
-    const errorMessage =
-      err instanceof Error ? err.message : "Unknown error occurred";
-    console.error(`❌ Failed to fetch ${endpoint}:`, errorMessage);
-    throw new Error(`Failed to fetch ${endpoint}: ${errorMessage}`);
+    // const errorMessage =
+    //   err instanceof Error ? err.message : "Unknown error occurred";
+    // console.error(`❌ Failed to fetch ${endpoint}:`, errorMessage);
+    // throw new Error(`Failed to fetch ${endpoint}: ${errorMessage}`);
   }
 };

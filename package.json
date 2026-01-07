@@ -20,7 +20,7 @@
     "crypto-js": "^4.2.0",
     "embla-carousel-react": "^8.6.0",
     "event-source-polyfill": "^1.0.31",
-    "framer-motion": "^12.23.24",
+    "framer-motion": "^12.24.7",
     "hamburger-react": "^2.5.2",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.553.0",
