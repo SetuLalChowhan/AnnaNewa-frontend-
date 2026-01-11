@@ -21,7 +21,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     category,
     slug,
   } = product;
-  const mainImage = images?.length > 0 ? images[0]?.url : DummyImage;
+  const mainImage = images?.[0]?.url || DummyImage;
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 w-full max-w-sm">

@@ -1,8 +1,10 @@
 "use client";
-import React, { useState, FC, ChangeEvent } from "react";
+import React, { useState, useEffect, FC, ChangeEvent } from "react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { X, Upload, Calendar, Loader } from "lucide-react";
 import useMutationClient from "@/hooks/useMutationClient";
+import useClient from "@/hooks/useClient";
+import useAxiosPublic from "@/hooks/useAxiosPublic";
 import { useValueStore } from "@/providers/useState";
 import ErrorHandler from "@/components/common/ErrorHandler";
 import ReactQuill from "react-quill-new";
@@ -14,6 +16,11 @@ interface LocationData {
   city: string;
   state: string;
   zipCode: string;
+}
+
+interface Category {
+  _id: string;
+  name: string;
 }
 
 interface ProductFormData {
@@ -223,6 +230,13 @@ const ProductForm: FC = () => {
   const [error, setError] = useState<string>("");
   const { apiError, setApiError } = useValueStore();
 
+  const { data: categoryData } = useClient({
+    queryKey: ["categories"],
+    url: "/categories",
+  });
+
+  const categories = categoryData?.categories || [];
+
   const {
     control,
     handleSubmit,
@@ -285,7 +299,7 @@ const ProductForm: FC = () => {
     successMessage: "Product created!",
     invalidateKeys: [["products"]],
     resetFunction: reset,
-    setImages :setImages
+    setImages: setImages,
   });
 
   const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
@@ -325,7 +339,6 @@ const ProductForm: FC = () => {
         data: formData,
         config: { headers: { "Content-Type": "multipart/form-data" } },
       });
-      
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "An error occurred";
@@ -512,11 +525,14 @@ const ProductForm: FC = () => {
                         {...field}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:border-emerald-500"
                       >
-                        <option value="fruits">Fruits</option>
-                        <option value="vegetables">Vegetables</option>
-                        <option value="grains">Grains</option>
-                        <option value="dairy">Dairy</option>
-                        <option value="others">Others</option>
+                        <option value="" disabled>
+                          Select a category
+                        </option>
+                        {categories.map((cat: Category) => (
+                          <option key={cat._id} value={cat._id}>
+                            {cat.name}
+                          </option>
+                        ))}
                       </select>
                       {errors.category && (
                         <p className="text-red-500 text-xs mt-1">

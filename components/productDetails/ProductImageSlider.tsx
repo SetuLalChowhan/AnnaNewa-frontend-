@@ -1,27 +1,35 @@
 "use client";
-
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import React, { useState } from "react";
+import DummyImage from "@/assets/images/dumy.png";
+
+interface ImageDetails {
+  public_id: string;
+  url: string;
+  _id?: string;
+}
 
 interface Props {
-  images: (string | StaticImageData)[];
+  images: ImageDetails[];
 }
 
 const ProductImageSlider: React.FC<Props> = ({ images }) => {
-  const [mainImage, setMainImage] = useState<string | StaticImageData>(
-    images[0] || ""
+  const [mainImage, setMainImage] = useState<any>(
+    images?.[0]?.url || DummyImage
   );
 
   return (
     <div className="flex flex-col items-center space-y-4">
       {/* Main Image */}
       <div className="w-full  relative h-[400px] md:h-[500px]">
-        <Image
-          src={mainImage}
-          alt="Main Product Image"
-          fill
-          className="object-cover"
-        />
+        {mainImage && (
+          <Image
+            src={mainImage}
+            alt="Main Product Image"
+            fill
+            className="object-cover"
+          />
+        )}
       </div>
 
       {/* Thumbnails */}
@@ -30,10 +38,10 @@ const ProductImageSlider: React.FC<Props> = ({ images }) => {
           <div
             key={idx}
             className="relative md:h-24 h-14 cursor-pointer rounded-lg overflow-hidden border border-gray-200"
-            onClick={() => setMainImage(img)}
+            onClick={() => setMainImage(img.url)}
           >
             <Image
-              src={img}
+              src={img.url || DummyImage}
               alt={`Thumbnail ${idx + 1}`}
               width={300}
               height={200}

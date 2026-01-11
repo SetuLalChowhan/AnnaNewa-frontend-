@@ -13,7 +13,7 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
   const { title, description, images, byAdmin, createdAt } = article;
 
   const mainImage =
-    images && images.length > 0 ? images[0] : "/images/placeholder.png";
+    (images && images.length > 0 && images[0]) || "/images/placeholder.png";
 
   const readableDate = new Date(createdAt).toLocaleDateString("en-US", {
     month: "short",
@@ -51,7 +51,11 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
 
       {/* Button Section */}
       <div className="w-full p-4 inline-flex">
-        <PrimaryBtn text="Read More" href="/article/2" className="text-center w-full" />
+        <PrimaryBtn
+          text="Read More"
+          href="/article/2"
+          className="text-center w-full"
+        />
       </div>
     </div>
   );

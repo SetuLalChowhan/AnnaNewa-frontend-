@@ -1,5 +1,5 @@
 import { StaticImageData } from "next/image";
-
+import { Product } from "./Product";
 
 interface Address {
   street?: string;
@@ -21,13 +21,19 @@ interface User {
 
 interface Bid {
   user: User;
-  amount: number;
-  createdAt?: string; // <-- optional now
+  bidAmount: number;
+  createdAt?: string;
   deliveryAddress?: Address;
   status?: "pending" | "accepted" | "rejected";
   paymentMethod?: string;
   _id: string;
   bidAt?: string;
+}
+
+interface ImageDetails {
+  public_id: string;
+  url: string;
+  _id?: string;
 }
 
 export interface ProductDetails {
@@ -36,22 +42,32 @@ export interface ProductDetails {
   description: string;
   pricePerKg: number;
   totalWeight: number;
-  images: (string | StaticImageData)[];
+  images: ImageDetails[];
   user: User;
   userRole: "buyer" | "seller";
   postType: "buy" | "sell";
   status: "active" | "sold" | "expired" | "purchased";
-  category: string;
+  category: {
+    _id: string;
+    name: string;
+  };
   expiryDate?: string;
   companyRevenue: number;
   bids: Bid[];
   createdAt: string;
   updatedAt: string;
   slug: string;
+  location?: {
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
   soldAt?: string;
   bidWinner?: {
     user: string;
     bidAmount: number;
     acceptedAt: string;
   } | null;
+  relatedProduct?: Product[];
 }
