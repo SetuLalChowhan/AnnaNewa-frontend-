@@ -35,7 +35,7 @@ const HeroSection = () => {
       </div>
 
       {/* Static Content */}
-      <div className="absolute inset-0 z-10 flex flex-col items-start justify-center px-6 sm:px-12 section-padding-y text-white">
+      <div className="absolute inset-0 z-10 flex flex-col items-start justify-center  section-padding-x  section-padding-y text-white">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 drop-shadow-lg">
           Connecting Farmers & Buyers Directly
         </h1>

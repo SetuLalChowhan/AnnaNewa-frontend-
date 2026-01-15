@@ -16,6 +16,7 @@ const page = async ({ params }: PageProps) => {
   const product: ProductDetails = {
     ...response.product,
     relatedProduct: response.relatedProduct,
+    topBids: response.topBids,
   };
 
   if (!product) {

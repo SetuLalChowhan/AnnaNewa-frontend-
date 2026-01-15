@@ -28,7 +28,7 @@ const useMutationClient = <T = any, V = any>({
   onError,
   isLogin = false,
   resetFunction,
-  setImages
+  setImages,
 }: {
   url: string;
   method?: Method;
@@ -41,7 +41,7 @@ const useMutationClient = <T = any, V = any>({
   onError?: (error: any) => void;
   isLogin?: boolean;
   resetFunction?: Function;
-  setImages?: Function
+  setImages?: Function;
 }) => {
   const queryClient = useQueryClient();
   const client = isPrivate ? useAxiosSecure() : useAxiosPublic();
@@ -50,10 +50,13 @@ const useMutationClient = <T = any, V = any>({
 
   const router = useRouter();
   return useMutation<T, any, Payload<V>>({
-    mutationFn: async ({ data, config }) =>
-      method === "delete"
-        ? await client.delete(url, config)
-        : await client[method](url, data, config),
+    mutationFn: async ({ data, config }) => {
+      const res =
+        method === "delete"
+          ? await client.delete(url, config)
+          : await client[method](url, data, config);
+      return res.data;
+    },
 
     onSuccess: (data: any) => {
       toast.success((data as any)?.message || successMessage);
@@ -71,7 +74,7 @@ const useMutationClient = <T = any, V = any>({
       if (redirectTo) router.push(redirectTo);
       setApiError("");
       resetFunction?.();
-      setImages?.([])
+      setImages?.([]);
 
       onSuccess?.(data);
     },

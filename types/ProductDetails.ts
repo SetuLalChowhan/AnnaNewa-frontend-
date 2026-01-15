@@ -70,4 +70,5 @@ export interface ProductDetails {
     acceptedAt: string;
   } | null;
   relatedProduct?: Product[];
+  topBids?: Bid[];
 }

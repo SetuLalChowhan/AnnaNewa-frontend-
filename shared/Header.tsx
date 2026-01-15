@@ -21,9 +21,7 @@ const Header = () => {
   const [isOpen, setOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
   const pathname = usePathname();
-  const { userData ,user} = useAuth();
-
-  
+  const { userData, user, isLoading } = useAuth();
 
   // Function to check if link is active
   const isActive = (href: string) => {
@@ -126,7 +124,7 @@ const Header = () => {
           </DropdownMenu>
         </div> */}
 
-          <Link
+        <Link
           href="/products"
           className={`hover:text-primaryColor transition ${
             isActive("/products") ? "text-primaryColor font-semibold" : ""
@@ -162,7 +160,12 @@ const Header = () => {
           Contact
         </Link>
 
-        {user ? (
+        {isLoading ? (
+          <div className="flex items-center gap-2 animate-pulse">
+            <div className="w-10 h-10 rounded-full bg-gray-200"></div>
+            <div className="hidden md:block w-20 h-4 bg-gray-200 rounded"></div>
+          </div>
+        ) : user ? (
           <UserDropdown />
         ) : (
           <div className="hidden md:block">

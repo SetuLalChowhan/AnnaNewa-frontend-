@@ -20,7 +20,7 @@ type FormValues = {
 };
 
 const page = () => {
-  const {  user } = useAuth();
+  const { user } = useAuth();
 
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -86,7 +86,6 @@ const page = () => {
     isPrivate: true,
     successMessage: "Profile updated!",
     invalidateKeys: [["userProfile"]],
-    isLogin: true,
   });
 
   const handleUploadImage = async () => {

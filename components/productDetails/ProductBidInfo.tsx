@@ -6,6 +6,8 @@ import { IoLocationOutline } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
 import useClient from "@/hooks/useClient";
 import PlaceBidModal from "./PlaceBidModal";
+import { useQueryClient } from "@tanstack/react-query";
+import { socket } from "@/utils/socket";
 
 interface Props {
   product: ProductDetails;
@@ -72,6 +74,7 @@ const ProductBidInfo = ({ product: initialProduct }: Props) => {
   });
 
   const product = dynamicData?.product || initialProduct;
+  const topBids = dynamicData?.topBids || product.topBids;
   const [isExpired, setIsExpired] = useState(false);
 
   const winner = product.bidWinner;
@@ -93,7 +96,51 @@ const ProductBidInfo = ({ product: initialProduct }: Props) => {
   );
 
   const showWinner = isExpired || !!winner;
-  
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!product._id) return;
+
+    socket.connect();
+    socket.emit("joinProduct", product._id);
+
+    const handleNewBid = (data: any) => {
+      if (data.productId !== product._id) return;
+
+      queryClient.setQueryData(["product", product._id, {}], (oldData: any) => {
+        if (!oldData || !oldData.product) return oldData;
+
+        const newProduct = { ...oldData.product };
+
+        if (data.bid.type === "NEW_BID") {
+          const exists = newProduct.bids.some(
+            (b: any) => b._id === data.bid.newBid._id
+          );
+          if (!exists) {
+            newProduct.bids = [...newProduct.bids, data.bid.newBid];
+          }
+        } else if (data.bid.type === "BID_ACCEPTED") {
+          newProduct.status = data.bid.status;
+          newProduct.bidWinner = data.bid.winner;
+        }
+
+        return {
+          ...oldData,
+          product: newProduct,
+          topBids: data.bid.topBids || oldData.topBids,
+        };
+      });
+    };
+
+    socket.on("newBid", handleNewBid);
+
+    return () => {
+      socket.emit("leaveProduct", product._id);
+      socket.off("newBid", handleNewBid);
+      socket.disconnect();
+    };
+  }, [product._id, queryClient]);
 
   return (
     <div className="space-y-6">
@@ -183,31 +230,79 @@ const ProductBidInfo = ({ product: initialProduct }: Props) => {
         ) : (
           <>
             {/* Current Best Bid */}
-            <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-              <h3 className="font-semibold text-primaryColor mb-2 text-lg">
+            {/* Top Bids List */}
+            <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 h-48 overflow-y-auto">
+              <h3 className="font-semibold text-primaryColor mb-4 text-lg">
                 {product.postType === "sell"
-                  ? "Current Highest Bid"
-                  : "Current Lowest Offer"}
+                  ? "Top 5 Highest Bids"
+                  : "Top 5 Lowest Offers"}
               </h3>
-              {currentBestBid ? (
+
+              {/* Combine topBids from API/Socket with local fallbacks if needed */}
+              {topBids && topBids.length > 0 ? (
+                <div className="space-y-3">
+                  {topBids.map((bid: any, index: any) => (
+                    <div
+                      key={bid._id || index}
+                      className={`flex justify-between items-center p-3 rounded-lg ${
+                        index === 0
+                          ? "bg-primaryColor/10 border border-primaryColor/20"
+                          : "bg-white border border-gray-100"
+                      }`}
+                    >
+                      <div>
+                        <p className="font-medium text-gray-800">
+                          {bid.user?.name ?? "Anonymous"}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {bid.bidAt
+                            ? new Date(bid.bidAt).toLocaleString()
+                            : ""}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p
+                          className={`font-bold ${
+                            index === 0 ? "text-primaryColor" : "text-gray-700"
+                          }`}
+                        >
+                          ৳ {bid.bidAmount}
+                        </p>
+                        {index === 0 && (
+                          <span className="text-[10px] uppercase font-bold text-primaryColor">
+                            Top Bid
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : currentBestBid ? (
+                // Fallback for singular bid if topBids array isn't populated for some reason
                 <div className="space-y-1 text-base text-gray-600">
-                  <p>
-                    <span className="font-medium">Bidder:</span>{" "}
-                    {currentBestBid.user?.name ?? "N/A"}
-                  </p>
-                  <p>
-                    <span className="font-medium">Amount:</span> ৳{" "}
-                    {currentBestBid.bidAmount ?? "N/A"}
-                  </p>
-                  <p>
-                    <span className="font-medium">Bid Time:</span>{" "}
-                    {currentBestBid.bidAt
-                      ? new Date(currentBestBid.bidAt).toLocaleString()
-                      : "N/A"}
-                  </p>
+                  <div className="flex justify-between items-center p-3 rounded-lg bg-primaryColor/10 border border-primaryColor/20">
+                    <div>
+                      <p className="font-medium text-gray-800">
+                        {currentBestBid.user?.name ?? "N/A"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {currentBestBid.bidAt
+                          ? new Date(currentBestBid.bidAt).toLocaleString()
+                          : ""}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-primaryColor">
+                        ৳ {currentBestBid.bidAmount}
+                      </p>
+                      <span className="text-[10px] uppercase font-bold text-primaryColor">
+                        Top Bid
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm italic">
+                <p className="text-gray-500 text-sm italic text-center py-4">
                   No bids yet. Be the first to bid!
                 </p>
               )}
