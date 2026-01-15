@@ -1,11 +1,17 @@
-import { StaticImageData } from "next/image";
+export interface ArticleImage {
+  public_id: string;
+  url: string;
+  _id?: string;
+}
 
 export interface Article {
-  id: number;
+  _id: string;
   title: string;
-  bannerImage?: string | StaticImageData;
   description: string;
-  images: (string | StaticImageData)[];   // multiple images
-  byAdmin: string;
+  slug: string;
+  cover_image: ArticleImage;
+  images: ArticleImage[];
   createdAt: string;
+  updatedAt: string;
+  __v?: number;
 }

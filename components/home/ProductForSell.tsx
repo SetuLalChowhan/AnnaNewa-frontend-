@@ -13,7 +13,7 @@ const ProductForSell = async () => {
     <div className="section-padding-x section-padding-y">
       <div className=" flex w-full gap-6 justify-between items-center">
         <Title36>Product For Sell</Title36>
-        <div hidden={length<=4} >
+        <div hidden={length <= 4}>
           <PrimaryBtn text="View All" href="/products" />
         </div>
       </div>
@@ -24,7 +24,7 @@ const ProductForSell = async () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  xlg:grid-cols-4 gap-6 mt-6">
-          {products?.products.map((product: any) => (
+          {products?.products.slice(0, 4).map((product: any) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

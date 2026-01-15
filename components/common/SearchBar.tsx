@@ -1,16 +1,38 @@
 import { useValueStore } from "@/providers/useState";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import useDebounce from "@/hooks/useDebounce";
+
+import { usePathname, useRouter } from "next/navigation";
 
 const SearchBar = () => {
   const { filterValue, setFilterValue } = useValueStore();
+  const [localSearch, setLocalSearch] = useState(filterValue.search || "");
+  const debouncedSearch = useDebounce(localSearch, 500);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (debouncedSearch && pathname !== "/products") {
+      router.push("/products#products-section");
+    }
+    setFilterValue({ search: debouncedSearch });
+  }, [debouncedSearch, setFilterValue, pathname, router]);
+
+  // Sync local state if global state changes from elsewhere (e.g. clear filters)
+  useEffect(() => {
+    if (filterValue.search !== localSearch) {
+      setLocalSearch(filterValue.search || "");
+    }
+  }, [filterValue.search]);
+
   return (
     <div className="flex items-center text-sm gap-2 bg-gray-100 border border-gray-300 px-3 rounded-full">
       <input
         className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500"
         type="text"
         placeholder="Search products"
-        value={filterValue.search}
-        onChange={(e) => setFilterValue({ search: e.target.value })}
+        value={localSearch}
+        onChange={(e) => setLocalSearch(e.target.value)}
       />
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path

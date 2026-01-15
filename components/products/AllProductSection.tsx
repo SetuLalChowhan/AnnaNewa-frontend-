@@ -9,7 +9,17 @@ import { useValueStore } from "@/providers/useState";
 const AllProductSection = ({ products }: any) => {
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
-  const { filterValue, setFilterValue } = useValueStore();
+  const { filterValue } = useValueStore();
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [
+    filterValue.search,
+    filterValue.category_id,
+    filterValue.postType,
+    filterValue.sort,
+  ]);
+
   const { data, isLoading, isError } = useClient({
     queryKey: ["products"],
     url: "/product/all-products",
@@ -24,7 +34,7 @@ const AllProductSection = ({ products }: any) => {
   });
 
   return (
-    <div className="relative">
+    <div id="products-section" className="relative">
       <div className="section-padding-x section-padding-y flex w-full gap-10">
         {/* Desktop Filter Sidebar */}
         <div className="w-[25%] hidden md:block">

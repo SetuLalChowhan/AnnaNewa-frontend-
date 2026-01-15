@@ -7,11 +7,11 @@ import AllArticleSection from "@/components/articles/AllArticleSection";
 const page = () => {
   return (
     <div>
-      <CommonBanner
+      {/* <CommonBanner
         bannerImage={ArticleBanner}
         title={`Latest Agriculture Articles, Farming Tips, and Market Trends`}
         description={`Read in-depth articles on farming techniques, fair pricing, agricultural technology, rural development, and direct farmer-to-consumer marketplaces. Stay ahead with actionable insights and industry-leading updates.`}
-      />
+      /> */}
 
       <AllArticleSection />
     </div>

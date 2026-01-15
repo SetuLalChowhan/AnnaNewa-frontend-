@@ -12,14 +12,12 @@ const page = async () => {
     queryFn: () => fetchData("product/all-products"),
   });
 
-  const products = queryClient.getQueryData(["products"]);
-
   return (
     <div>
-      <ProductBanner />
+      {/* <ProductBanner /> */}
 
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <AllProductSection  />
+        <AllProductSection />
       </HydrationBoundary>
     </div>
   );

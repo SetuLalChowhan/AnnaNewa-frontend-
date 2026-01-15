@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import ProductCard from "../card/ProductCard";
+import ProductSkeleton from "../skeleton/ProductSkeleton";
 import {
   Select,
   SelectTrigger,
@@ -96,8 +97,10 @@ const AllProducts = ({
 
       {/* Product Grid */}
       {isLoading ? (
-        <div className="flex justify-center items-center py-10">
-          <Loader className="text-green-600 animate-spin" size={34} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+          {[...Array(6)].map((_, index) => (
+            <ProductSkeleton key={index} />
+          ))}
         </div>
       ) : length === 0 ? (
         <div className="text-center mt-10">
@@ -110,15 +113,16 @@ const AllProducts = ({
           ))}
         </div>
       )}
-
       {/* Pagination */}
-      <div className="flex w-full justify-center mt-10 items-center">
-        <Pagination
-          page={page}
-          setPage={setPage}
-          totalPage={pagination?.totalPages || 1}
-        />
-      </div>
+      {length > 0 && (
+        <div className="flex w-full justify-center mt-10 items-center">
+          <Pagination
+            page={page}
+            setPage={setPage}
+            totalPage={pagination?.totalPages || 1}
+          />
+        </div>
+      )}
     </div>
   );
 };

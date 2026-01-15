@@ -4,19 +4,12 @@ import { GoSearch } from "react-icons/go";
 interface Props {
   search: string;
   setSearch: Function;
-  setArticleFilter: Function;
 }
 
-const ArticleSearchBar = ({ search, setSearch, setArticleFilter }: Props) => {
+const ArticleSearchBar = ({ search, setSearch }: Props) => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearch(value);
-
-    // update parent filter
-    setArticleFilter((prev: any) => ({
-      ...prev,
-      search: value,
-    }));
   };
 
   return (

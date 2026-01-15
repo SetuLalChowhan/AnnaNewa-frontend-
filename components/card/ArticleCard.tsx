@@ -10,10 +10,9 @@ interface ArticleCardProps {
 }
 
 const ArticleCard = ({ article }: ArticleCardProps) => {
-  const { title, description, images, byAdmin, createdAt } = article;
+  const { title, description, cover_image, createdAt, slug } = article;
 
-  const mainImage =
-    (images && images.length > 0 && images[0]) || "/images/placeholder.png";
+  const mainImage = cover_image?.url || "/images/placeholder.png";
 
   const readableDate = new Date(createdAt).toLocaleDateString("en-US", {
     month: "short",
@@ -45,7 +44,7 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
         </Title14>
 
         <TitleBase className="text-gray-500">
-          By {byAdmin} • {readableDate}
+          By Admin • {readableDate}
         </TitleBase>
       </div>
 
@@ -53,7 +52,7 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
       <div className="w-full p-4 inline-flex">
         <PrimaryBtn
           text="Read More"
-          href="/article/2"
+          href={`/article/${slug}`}
           className="text-center w-full"
         />
       </div>
