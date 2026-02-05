@@ -10,11 +10,11 @@ const Page: React.FC = () => {
 
   return (
     <PrivateRoute>
-      <div className="flex flex-col md:flex-row gap-6 md:gap-10 p-4 md:p-10 w-full h-screen bg-linear-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-950">
-        <div className="w-full md:w-1/4">
+      <div className="fixed top-[74px] left-0 w-full h-[calc(100vh-74px)] flex flex-col md:flex-row gap-6 md:gap-10 p-4 md:p-10 overflow-hidden">
+        <div className="w-full md:w-1/4 h-full overflow-y-auto">
           <LeftQuestion setSelectedQuestion={setSelectedQuestion} />
         </div>
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 bg-white/50 backdrop-blur-sm rounded-xl shadow-sm border border-white/20 overflow-hidden">
           <RightSideChat selectedQuestion={selectedQuestion} />
         </div>
       </div>
