@@ -13,11 +13,20 @@ export interface User {
   phone: string;
 }
 
+export interface ProductImage {
+  public_id: string;
+  url: string;
+  _id: string;
+}
+
 export interface Product {
   _id: string;
   title: string;
-  images: string[];
-  category: string;
+  images: ProductImage[];
+  category: {
+    _id: string;
+    name: string;
+  };
   slug: string;
 }
 
@@ -25,7 +34,7 @@ export interface Order {
   _id: string;
   orderNumber: string;
   product: Product;
-  postType: 'sell' | 'buy';
+  postType: "sell" | "buy";
   seller: User;
   buyer: User;
   quantity: number;
@@ -36,9 +45,15 @@ export interface Order {
   buyerPayment: number;
   commissionRate: number;
   paymentMethod: string;
-  paymentStatus: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
-  deliveryStatus: 'Pending' | 'Confirmed' | 'Shipped' | 'Out for Delivery' | 'Delivered' | 'Cancelled';
-  orderStatus: 'Processing' | 'Completed' | 'Cancelled' | 'Refunded';
+  paymentStatus: "Pending" | "Paid" | "Failed" | "Refunded";
+  deliveryStatus:
+    | "Pending"
+    | "Confirmed"
+    | "Shipped"
+    | "Out for Delivery"
+    | "Delivered"
+    | "Cancelled";
+  orderStatus: "Processing" | "Completed" | "Cancelled" | "Refunded";
   sellerLocation: Location;
   buyerLocation: Location;
   deliveryAddress: Location;

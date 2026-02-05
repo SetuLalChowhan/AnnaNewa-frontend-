@@ -12,6 +12,17 @@ export interface User {
   email: string;
 }
 
+export interface ProductImage {
+  public_id: string;
+  url: string;
+  _id: string;
+}
+
+export interface Category {
+  _id: string;
+  name: string;
+}
+
 export interface Bid {
   deliveryAddress: Location;
   user: User;
@@ -34,7 +45,7 @@ export interface Product {
   description: string;
   pricePerKg: number;
   totalWeight: number;
-  category: string;
+  category: Category;
   status: string;
   user: string;
   userRole: string;
@@ -47,6 +58,7 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   slug: string;
-  images?: string[];
+  images: ProductImage[];
   __v?: number;
+  soldAt?: string;
 }

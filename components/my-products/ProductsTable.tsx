@@ -1,39 +1,129 @@
-import React from 'react';
-import { Eye } from 'lucide-react';
-import { Bid, Product } from "@/types/myProducts"
-import { ProductImage } from './ProductImage';
-import { StatusBadge } from './StatusBadge';
+import React from "react";
+import { Eye } from "lucide-react";
+import { Product } from "@/types/myProducts";
+import { ProductImage } from "./ProductImage";
+import { StatusBadge } from "./StatusBadge";
 
 interface ProductsTableProps {
   products: Product[];
   onViewBids: (product: Product) => void;
+  isLoading?: boolean;
 }
 
-export const ProductsTable: React.FC<ProductsTableProps> = ({ products, onViewBids }) => {
+export const ProductsTable: React.FC<ProductsTableProps> = ({
+  products,
+  onViewBids,
+  isLoading,
+}) => {
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Product
+                </th>
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Category
+                </th>
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Price
+                </th>
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Weight
+                </th>
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Status
+                </th>
+                <th className="px-4 py-4 text-sm text-center font-semibold text-gray-700">
+                  Bids
+                </th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-gray-700">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <tr key={i} className="animate-pulse">
+                  <td className="px-4 py-4">
+                    <div className="h-10 w-32 bg-gray-200 rounded"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-8 w-8 mx-auto bg-gray-200 rounded-full"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-8 w-24 mx-auto bg-gray-200 rounded-lg"></div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Product</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Category</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Price</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Weight</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-              <th className="px-4 py-4 text-sm text-center font-semibold text-gray-700">Bids</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Product
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Category
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Price
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Weight
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Status
+              </th>
+              <th className="px-4 py-4 text-sm text-center font-semibold text-gray-700">
+                Bids
+              </th>
               {/* <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Revenue</th> */}
-              <th className="px-4 py-4 text-center text-sm font-semibold text-gray-700">Actions</th>
+              <th className="px-4 py-4 text-center text-sm font-semibold text-gray-700">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
-            {products.map((product) => (
-              <TableRow 
-                key={product._id} 
-                product={product} 
-                onViewBids={onViewBids} 
-              />
-            ))}
+            {products.length > 0 ? (
+              products.map((product) => (
+                <TableRow
+                  key={product._id}
+                  product={product}
+                  onViewBids={onViewBids}
+                />
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  No products found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -41,21 +131,21 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({ products, onViewBi
   );
 };
 
-const TableRow: React.FC<{ product: Product; onViewBids: (product: Product) => void }> = ({ 
-  product, 
-  onViewBids 
-}) => (
+const TableRow: React.FC<{
+  product: Product;
+  onViewBids: (product: Product) => void;
+}> = ({ product, onViewBids }) => (
   <tr className="hover:bg-gray-50 transition-colors group">
     <ProductCell product={product} />
-    <CategoryCell category={product.category} />
+    <CategoryCell category={product.category.name} />
     <PriceCell price={product.pricePerKg} />
     <WeightCell weight={product.totalWeight} />
     <StatusCell status={product.status} />
     <BidsCell bidCount={product.bids.length} />
     {/* <RevenueCell revenue={product.companyRevenue} /> */}
-    <ActionCell 
-      hasBids={product.bids.length > 0} 
-      onViewBids={() => onViewBids(product)} 
+    <ActionCell
+      hasBids={product.bids.length > 0}
+      onViewBids={() => onViewBids(product)}
     />
   </tr>
 );
@@ -63,9 +153,14 @@ const TableRow: React.FC<{ product: Product; onViewBids: (product: Product) => v
 const ProductCell: React.FC<{ product: Product }> = ({ product }) => (
   <td className="px-4 py-4">
     <div className="flex items-center space-x-3">
-      <ProductImage images={product.images} title={product.title} />
+      <ProductImage
+        images={product.images.map((i) => i.url)}
+        title={product.title}
+      />
       <div className="min-w-0">
-        <p className="text-sm font-medium text-gray-900 truncate">{product.title}</p>
+        <p className="text-sm font-medium text-gray-900 truncate">
+          {product.title}
+        </p>
         <p className="text-xs text-gray-500 truncate">{product.description}</p>
       </div>
     </div>
@@ -100,9 +195,13 @@ const StatusCell: React.FC<{ status: string }> = ({ status }) => (
 const BidsCell: React.FC<{ bidCount: number }> = ({ bidCount }) => (
   <td className="px-4 py-4">
     <div className="text-center">
-      <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
-        bidCount > 0 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
-      }`}>
+      <span
+        className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
+          bidCount > 0
+            ? "bg-blue-100 text-blue-800"
+            : "bg-gray-100 text-gray-500"
+        }`}
+      >
         {bidCount}
       </span>
     </div>
@@ -115,9 +214,9 @@ const BidsCell: React.FC<{ bidCount: number }> = ({ bidCount }) => (
 //   </td>
 // );
 
-const ActionCell: React.FC<{ hasBids: boolean; onViewBids: () => void }> = ({ 
-  hasBids, 
-  onViewBids 
+const ActionCell: React.FC<{ hasBids: boolean; onViewBids: () => void }> = ({
+  hasBids,
+  onViewBids,
 }) => (
   <td className="px-4 py-4 text-center">
     {hasBids ? (
