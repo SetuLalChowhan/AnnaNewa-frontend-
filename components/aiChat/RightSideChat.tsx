@@ -276,7 +276,7 @@ const RightSideChat = ({
       abortControllerRef.current = new AbortController();
 
       try {
-        const response = await fetch("http://localhost:4000/api/ai/chat", {
+        const response = await fetch("https://ana-newa.vercel.app/api/ai/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text }),
