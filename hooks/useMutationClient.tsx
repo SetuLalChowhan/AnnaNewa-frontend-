@@ -62,6 +62,7 @@ const useMutationClient = <T = any, V = any>({
       toast.success((data as any)?.message || successMessage);
 
       if (isLogin) {
+        localStorage.setItem("anna_newa_logged_in", "true");
         setUser(data.user);
       }
       if (data.resetKey) {
@@ -69,7 +70,7 @@ const useMutationClient = <T = any, V = any>({
       }
       // ✅ Wrap key array in { queryKey: key }
       invalidateKeys.forEach((key) =>
-        queryClient.invalidateQueries({ queryKey: key })
+        queryClient.invalidateQueries({ queryKey: key }),
       );
       if (redirectTo) router.push(redirectTo);
       setApiError("");

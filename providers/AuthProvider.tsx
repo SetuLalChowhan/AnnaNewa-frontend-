@@ -35,14 +35,25 @@ export const AuthProvider = ({
   } = useQuery<User>({
     queryKey: ["userProfile"],
     queryFn: async () => {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
-        { withCredentials: true }
-      );
-      setUser(res.data.user);
-      return res.data.user;
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
+          { withCredentials: true },
+        );
+        const fetchedUser = res.data.user;
+        if (fetchedUser) {
+          localStorage.setItem("anna_newa_logged_in", "true");
+          setUser(fetchedUser);
+        }
+        return fetchedUser;
+      } catch (error) {
+        localStorage.removeItem("anna_newa_logged_in");
+        setUser(null);
+        throw error;
+      }
     },
     initialData: initialData || undefined,
+    retry: false,
   });
 
   const logout = async () => {
@@ -52,10 +63,11 @@ export const AuthProvider = ({
         {},
         {
           withCredentials: true,
-        }
+        },
       );
 
       queryClient.removeQueries({ queryKey: ["userProfile"] });
+      localStorage.removeItem("anna_newa_logged_in");
       router.push("/login");
       setUser(null);
       toast.success("Logout successful");

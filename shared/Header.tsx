@@ -23,6 +23,20 @@ const Header = () => {
   const pathname = usePathname();
   const { userData, user, isLoading } = useAuth();
 
+  // Only show loading if we have a hint that user might be logged in
+  const [showLoading, setShowLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hint = localStorage.getItem("anna_newa_logged_in");
+      if (hint === "true" && isLoading) {
+        setShowLoading(true);
+      } else {
+        setShowLoading(false);
+      }
+    }
+  }, [isLoading]);
+
   // Function to check if link is active
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -160,7 +174,7 @@ const Header = () => {
           Contact
         </Link>
 
-        {isLoading ? (
+        {showLoading ? (
           <div className="flex items-center gap-2 animate-pulse">
             <div className="w-10 h-10 rounded-full bg-gray-200"></div>
             <div className="hidden md:block w-20 h-4 bg-gray-200 rounded"></div>

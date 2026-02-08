@@ -11,12 +11,17 @@ const SearchBar = () => {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Redirect logic: Only trigger when search text changes and we aren't on /products
   useEffect(() => {
-    if (debouncedSearch && pathname !== "/products") {
+    if (debouncedSearch && window.location.pathname !== "/products") {
       router.push("/products#products-section");
     }
+  }, [debouncedSearch]); // Only depend on search text
+
+  // Update global filter value
+  useEffect(() => {
     setFilterValue({ search: debouncedSearch });
-  }, [debouncedSearch, setFilterValue, pathname, router]);
+  }, [debouncedSearch, setFilterValue]);
 
   // Sync local state if global state changes from elsewhere (e.g. clear filters)
   useEffect(() => {
